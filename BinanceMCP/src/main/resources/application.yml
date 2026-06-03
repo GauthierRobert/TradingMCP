@@ -1,0 +1,33 @@
+spring:
+  main:
+    # No web server: this is a STDIO MCP server.
+    web-application-type: none
+    banner-mode: off
+  ai:
+    mcp:
+      server:
+        # STDIO transport: the client launches this process and talks over stdin/stdout.
+        stdio: true
+        type: SYNC
+        name: binance-mcp-server
+        version: 0.1.0
+        instructions: >
+          Tools for Binance Spot: market data (prices, order book, klines, 24h stats),
+          account data (balances, open orders, trade history) and trading (place/cancel orders).
+
+binance:
+  base-url: https://api.binance.com
+  # Read from the environment. Never hard-code credentials here.
+  api-key: ${BINANCE_API_KEY:}
+  secret-key: ${BINANCE_SECRET_KEY:}
+  recv-window: 5000
+  # Safety switch: order placement/cancellation is refused unless this is true.
+  trading-enabled: ${BINANCE_TRADING_ENABLED:false}
+
+# CRITICAL for STDIO: stdout is the JSON-RPC channel, so NOTHING may be logged to the console.
+# Disable console logging and write all logs to a file instead.
+logging:
+  pattern:
+    console: ""
+  file:
+    name: logs/binance-mcp-server.log

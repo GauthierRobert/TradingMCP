@@ -1,0 +1,92 @@
+[
+  {
+    "minute": 20,
+    "side": "BUY",
+    "price": 70911.69,
+    "feeUSDT": 10,
+    "L": 5,
+    "theta": 0,
+    "equity": 9990
+  },
+  {
+    "minute": 30,
+    "side": "SELL",
+    "price": 70933.02,
+    "feeUSDT": 9.99,
+    "L": 5,
+    "theta": 0.002,
+    "equity": 9983.01
+  },
+  {
+    "minute": 730,
+    "side": "BUY",
+    "price": 67612.65,
+    "feeUSDT": 9.98,
+    "L": 5,
+    "theta": 0.002,
+    "equity": 9973.03
+  },
+  {
+    "minute": 740,
+    "side": "SELL",
+    "price": 67931.77,
+    "feeUSDT": 10.02,
+    "L": 5,
+    "theta": 0.002,
+    "equity": 10010.08
+  },
+  {
+    "minute": 800,
+    "side": "BUY",
+    "price": 67671.31,
+    "feeUSDT": 10.01,
+    "L": 5,
+    "theta": 0.002,
+    "equity": 10000.07
+  },
+  {
+    "minute": 810,
+    "side": "SELL",
+    "price": 67746.01,
+    "feeUSDT": 10.01,
+    "L": 5,
+    "theta": 0.002,
+    "equity": 10001.1
+  },
+  {
+    "minute": 900,
+    "side": "BUY",
+    "price": 67406.03,
+    "feeUSDT": 10,
+    "L": 5,
+    "theta": 0.002,
+    "equity": 9991.1
+  },
+  {
+    "minute": 910,
+    "side": "SELL",
+    "price": 67330,
+    "feeUSDT": 9.98,
+    "L": 5,
+    "theta": 0.002,
+    "equity": 9969.85
+  },
+  {
+    "minute": 950,
+    "side": "BUY",
+    "price": 67264,
+    "feeUSDT": 9.97,
+    "L": 5,
+    "theta": 0.002,
+    "equity": 9959.88
+  },
+  {
+    "minute": 960,
+    "side": "SELL",
+    "price": 67172.01,
+    "feeUSDT": 9.95,
+    "L": 5,
+    "theta": 0.002,
+    "equity": 9936.31
+  }
+]

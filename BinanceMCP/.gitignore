@@ -1,0 +1,25 @@
+target/
+logs/
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# Secrets — never commit credentials
+.env
+*.env
+application-local.yml
+application-local.properties
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code local overrides
+.claude/settings.local.json
+.local.env

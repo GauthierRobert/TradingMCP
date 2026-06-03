@@ -1,0 +1,72 @@
+[
+  {
+    "minute": 20,
+    "side": "BUY",
+    "price": 70911.69,
+    "feeUSDT": 10,
+    "L": 10,
+    "kE": 0.5,
+    "kX": 0.5,
+    "equity": 9990
+  },
+  {
+    "minute": 50,
+    "side": "SELL",
+    "price": 70916,
+    "feeUSDT": 9.99,
+    "L": 10,
+    "kE": 1,
+    "kX": 0.5,
+    "equity": 9980.62
+  },
+  {
+    "minute": 220,
+    "side": "BUY",
+    "price": 70218,
+    "feeUSDT": 9.98,
+    "L": 10,
+    "kE": 1,
+    "kX": 0.5,
+    "equity": 9970.64
+  },
+  {
+    "minute": 250,
+    "side": "SELL",
+    "price": 70003.47,
+    "feeUSDT": 9.94,
+    "L": 10,
+    "kE": 1.5,
+    "kX": 0.5,
+    "equity": 9930.23
+  },
+  {
+    "minute": 370,
+    "side": "BUY",
+    "price": 69660,
+    "feeUSDT": 9.93,
+    "L": 10,
+    "kE": 1.5,
+    "kX": 0.5,
+    "equity": 9920.3
+  },
+  {
+    "minute": 400,
+    "side": "SELL",
+    "price": 69505.01,
+    "feeUSDT": 9.9,
+    "L": 10,
+    "kE": 2,
+    "kX": 0.5,
+    "equity": 9888.33
+  },
+  {
+    "minute": 950,
+    "side": "BUY",
+    "price": 67264,
+    "feeUSDT": 9.89,
+    "L": 10,
+    "kE": 2,
+    "kX": 0.5,
+    "equity": 9878.44
+  }
+]

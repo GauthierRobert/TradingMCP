@@ -1,0 +1,21 @@
+{
+  "window": "2026-06-02T04:00:00.000Z -> 2026-06-02T20:39:59.999Z",
+  "candles_1m": 1000,
+  "decision_blocks": 98,
+  "fee_per_fill": "0.1%",
+  "start_usdt": 10000,
+  "results": {
+    "strategy_final": 9936.31,
+    "strategy_return": "-0.64%",
+    "buy_and_hold_final": 9485.93,
+    "buy_and_hold_return": "-5.14%",
+    "all_cash_final": 10000,
+    "all_cash_return": "0.00%"
+  },
+  "strategy_vs_bh_usdt": 450.38,
+  "trades": 10,
+  "total_fees_usdt": 99.91,
+  "max_drawdown": "0.84%",
+  "long_blocks": 5,
+  "long_block_hit_rate": "60.0%"
+}

@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "binance": {
+      "command": "C:\\Users\\GAR\\.jdks\\openjdk-25\\bin\\java.exe",
+      "args": [
+        "-jar",
+        "C:\\Users\\GAR\\Documents\\POC\\BinanceMCP\\BinanceMCP\\target\\binance-mcp-server-0.1.0.jar"
+      ],
+      "env": {
+        "BINANCE_TRADING_ENABLED": "false"
+      }
+    }
+  }
+}

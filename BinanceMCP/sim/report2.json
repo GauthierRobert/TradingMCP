@@ -1,0 +1,19 @@
+{
+  "version": "v2 (hysteresis + turnover penalty + vol-scaled bands)",
+  "window": "2026-06-02T04:00:00.000Z -> 2026-06-02T20:39:59.999Z",
+  "decision_blocks": 98,
+  "results": {
+    "strategy_final": 9867.27,
+    "strategy_return": "-1.33%",
+    "buy_and_hold_final": 9485.93,
+    "buy_and_hold_return": "-5.14%",
+    "all_cash_return": "0.00%"
+  },
+  "strategy_vs_bh_usdt": 381.34,
+  "strategy_vs_cash_usdt": -132.73,
+  "trades": 8,
+  "total_fees_usdt": 79.51,
+  "max_drawdown": "1.63%",
+  "long_blocks": 13,
+  "long_block_hit_rate": "30.8%"
+}
