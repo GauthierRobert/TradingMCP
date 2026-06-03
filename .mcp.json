@@ -1,5 +1,25 @@
 {
   "mcpServers": {
+    "alpaca": {
+      "command": "docker",
+      "args": [
+        "run", "--rm", "-i",
+        "-e", "ALPACA_API_KEY",
+        "-e", "ALPACA_SECRET_KEY",
+        "-e", "ALPACA_PAPER_TRADE=true",
+        "mcp/alpaca:latest", "alpaca-mcp-server", "--transport", "stdio"
+      ]
+    },
+    "alpaca-p1": {
+      "command": "docker",
+      "args": [
+        "run", "--rm", "-i",
+        "-e", "ALPACA_API_KEY=${ALPACA_API_KEY_P1}",
+        "-e", "ALPACA_SECRET_KEY=${ALPACA_SECRET_KEY_P1}",
+        "-e", "ALPACA_PAPER_TRADE=true",
+        "mcp/alpaca:latest", "alpaca-mcp-server", "--transport", "stdio"
+      ]
+    },
     "binance": {
       "command": "C:\\Users\\GAR\\.jdks\\openjdk-25\\bin\\java.exe",
       "args": [

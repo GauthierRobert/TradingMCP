@@ -1,15 +1,15 @@
 {
   "meta": {
-    "version": 5,
-    "updated": "2026-06-03T20:35:17.537Z",
-    "note": "Seed grid — UNVALIDATED. Active arm starts FLAT (A0). Run node run.mjs learn <SYM> <days> to score the trading arms on real recent 5Min bars; the bandit only leaves FLAT if a trading arm shows a positive net-of-fee EW mean.",
-    "lastLearn": "2026-06-03T20:35:17.537Z"
+    "version": 2,
+    "updated": "2026-06-03T21:05:22.193Z",
+    "note": "Seed grid for BINANCE spot — UNVALIDATED. Active arm starts FLAT (A0). Run `node run.mjs learn <SYM> <days>` to score the trading arms on real recent 5m Binance bars; the bandit only leaves FLAT if a trading arm shows a positive net-of-fee EW mean. Binance fees (0.10%/fill) are far lower than Alpaca's, so an arm can clear the floor more easily here — but do not assume it will; let the learner prove it.",
+    "lastLearn": "2026-06-03T21:05:22.193Z"
   },
   "config": {
-    "timeframe": "5Min",
-    "makerFee": 0.0015,
-    "takerFee": 0.0025,
-    "spreadEst": 0.0008,
+    "timeframe": "5m",
+    "makerFee": 0.001,
+    "takerFee": 0.001,
+    "spreadEst": 0.0003,
     "buffer": 0.001,
     "riskPct": 0.015,
     "maxWeight": 0.25,
@@ -59,12 +59,12 @@
         "cooldown": 6
       },
       "stats": {
-        "ewMean": -0.004632949178981166,
-        "n": 28.58796707050492,
-        "trades": 64,
-        "wins": 2,
-        "losses": 62,
-        "sumPnl": -0.3261017129869676
+        "ewMean": -0.002986218402942433,
+        "n": 28.86841821663808,
+        "trades": 66,
+        "wins": 9,
+        "losses": 57,
+        "sumPnl": -0.1746739855217866
       }
     },
     {
@@ -89,12 +89,12 @@
         "cooldown": 6
       },
       "stats": {
-        "ewMean": -0.005635952268519486,
-        "n": 27.97311103261409,
-        "trades": 60,
-        "wins": 3,
-        "losses": 57,
-        "sumPnl": -0.3294282264139956
+        "ewMean": -0.0035399646721262076,
+        "n": 28.28990017058659,
+        "trades": 62,
+        "wins": 9,
+        "losses": 53,
+        "sumPnl": -0.16684467409593262
       }
     },
     {
@@ -119,12 +119,12 @@
         "cooldown": 4
       },
       "stats": {
-        "ewMean": -0.005219926565846321,
-        "n": 29.93896618736532,
-        "trades": 75,
-        "wins": 1,
+        "ewMean": -0.002634411990066187,
+        "n": 30.59074291050249,
+        "trades": 82,
+        "wins": 8,
         "losses": 74,
-        "sumPnl": -0.40509800697551224
+        "sumPnl": -0.22224178288297003
       }
     },
     {
@@ -149,12 +149,12 @@
         "cooldown": 8
       },
       "stats": {
-        "ewMean": -0.006272928894368943,
-        "n": 6.400571840628999,
-        "trades": 7,
-        "wins": 0,
-        "losses": 7,
-        "sumPnl": -0.048635599153957466
+        "ewMean": -0.004593771498064581,
+        "n": 13.472465204706491,
+        "trades": 17,
+        "wins": 1,
+        "losses": 16,
+        "sumPnl": -0.058965328694539146
       }
     },
     {
@@ -179,12 +179,12 @@
         "cooldown": 6
       },
       "stats": {
-        "ewMean": -0.004877597506238989,
-        "n": 29.002365670138936,
-        "trades": 67,
-        "wins": 2,
-        "losses": 65,
-        "sumPnl": -0.3421840885521763
+        "ewMean": -0.0029882245786122716,
+        "n": 29.614184036741882,
+        "trades": 72,
+        "wins": 8,
+        "losses": 64,
+        "sumPnl": -0.19934188249849033
       }
     }
   ],

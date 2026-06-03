@@ -1,0 +1,6 @@
+# Runtime trade state — never commit live logs / fills / open positions.
+decisions.ndjson
+outcomes.ndjson
+positions.json
+
+# Tracked on purpose: params.json (seed + evolved config), SESSIONS.md (ledger)

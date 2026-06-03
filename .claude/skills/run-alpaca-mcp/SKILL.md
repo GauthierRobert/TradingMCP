@@ -1,5 +1,5 @@
 ---
-name: start-alpaca-mcp
+name: run-alpaca-mcp
 description: Build and start the Alpaca MCP server in Docker and wire it into Claude Code. Use when asked to start/run the Alpaca MCP server, build its Docker image, or connect Alpaca trading tools to Claude Code / Claude Desktop. Paper-trading by default.
 ---
 
