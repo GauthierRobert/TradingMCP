@@ -1,6 +1,6 @@
 ---
 name: bear-market-edge-findings
-description: Out-of-sample finding on whether long/flat spot can make money in bear markets (the spot-trade-decision skill)
+description: Out-of-sample finding on whether long/flat spot can make money in bear markets (the crypto-specific-skills skill)
 metadata:
   type: project
 ---
@@ -26,6 +26,6 @@ it rides knives down; the baseline bear loss was entirely trend.
 
 **Why:** no causal filter reliably distinguishes a relief-rally setup from a falling knife
 ex-ante — that's the core difficulty. So: beat B&H massively + ≈ match cash + occasionally
-catch a bounce is the realistic OOS ceiling, NOT systematic bear profit. See [[spot-trade-decision]]
+catch a bounce is the realistic OOS ceiling, NOT systematic bear profit. See [[crypto-specific-skills]]
 skill (updated with this evidence). Tooling: `sim/engine2.mjs`, `sim/validate2.mjs`,
 `sim/oos.mjs`, `sim/compare.mjs`, `sim/fetch.mjs`.

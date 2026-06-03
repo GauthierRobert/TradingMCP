@@ -1,4 +1,4 @@
-// Walk-forward adaptive engine ("spot-trade-decision" skill), timeframe-agnostic.
+// Walk-forward adaptive engine ("crypto-specific-skills" skill), timeframe-agnostic.
 // LONG/FLAT spot only, 0.10% taker fee/fill, decisions every `stepMin` minutes.
 // Fully walk-forward: every block re-optimizes on data seen so far, then decides next.
 //

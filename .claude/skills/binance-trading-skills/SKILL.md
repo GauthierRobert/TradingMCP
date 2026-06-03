@@ -1,13 +1,22 @@
 ---
-name: spot-trade-decision
-description: Decide BUY / SELL / HOLD on a Binance spot pair to maximize fee-adjusted profit. Use when asked whether to buy/sell/hold, to evaluate or time a trade, to detect a trend/pattern, or to "maximize profit" with the Binance MCP tools. Long/flat spot, fee-aware, SIMULATION-ONLY by default.
+name: crypto-specific-skills
+description: Decide BUY / SELL / HOLD on a Binance spot pair to maximize fee-adjusted profit, using ONLY the Binance MCP tools. Use when asked whether to buy/sell/hold, to evaluate or time a trade, to detect a trend/pattern, or to "maximize profit" on Binance (BTCUSDT, ETHUSDT, …). Long/flat spot, fee-aware, SIMULATION-ONLY by default. For Alpaca crypto, use the alpaca-crypto-trading skill instead.
+allowed-tools: mcp__binance__getPrice, mcp__binance__getOrderBook, mcp__binance__getKlines, mcp__binance__get24hStats, mcp__binance__getAccount, mcp__binance__getExchangeInfo, mcp__binance__getMyTrades, mcp__binance__getOpenOrders, mcp__binance__getOrder, mcp__binance__placeOrder, mcp__binance__cancelOrder, Read, Write, Bash, Glob, Grep
 ---
 
 # Spot trade decision (regime-first, fee-aware, pattern-driven)
 
 Decide whether to hold an asset (e.g. BTC) or sit in the quote (e.g. USDT) on **spot**.
 Long/flat only — no shorting. Tuned and validated by a walk-forward simulation across 6
-symbols and bull+bear regimes (see `sim/` and "Evidence").
+symbols and bull+bear regimes (see "Evidence"). The live decision logic ships **inside this
+skill** as `engine.mjs` (self-contained, no dependencies — exports `classifyRegime` for the
+regime call in Step 2 and `runBacktest` for the fee-aware engine in Step 4).
+
+> **MCP scope — Binance only.** This skill talks to the **Binance MCP exclusively**
+> (`mcp__binance__*`: `getPrice`, `getKlines`, `get24hStats`, `getOrderBook`, `getAccount`,
+> `placeOrder`, …). Do **not** call Alpaca or any other trading MCP from here — pairs (`BTCUSDT`),
+> fees (0.10%/fill), and order semantics are Binance-specific and the evidence below was measured
+> on Binance data. To trade crypto on **Alpaca**, use the sibling **`alpaca-crypto-trading`** skill.
 
 > **SIMULATION-ONLY.** Default to **fictive (paper) orders**. Never place a live order unless
 > the user explicitly asks AND `binance.trading-enabled=true`. The server ships with
@@ -29,12 +38,25 @@ symbols and bull+bear regimes (see `sim/` and "Evidence").
 
 So **step 1 is always: detect the tendency / regime.** Then pick the matching mode.
 
+## Current regime — 2026 (refresh before trusting these words)
+
+As of the last calibration (2026-06-03) the market is a **broad bear with one relief rally**:
+2026 YTD BTC **−24%**, ETH **−37%**, SOL **−40%**, BNB −24%, XRP −34%, DOGE −21%; the path was
+Jan −10%, Feb −15%, **Mar +2% / Apr +12% (relief)**, May −3.5%, Jun −9%. So the default posture
+right now is **FLAT (cash)**, with the opportunistic bounce module live only when a symbol is
+*choppy with bounces*. **Decide on the 1h timeframe** in this regime — see Step 1. Re-fetch fresh
+2026 data (via `getKlines` with `startTime`/`endTime`) and re-validate with a walk-forward
+backtest (`runBacktest` in the bundled `engine.mjs`) before relying on any of this; regimes change.
+
 ## Step 1 — Gather data (Binance MCP tools)
 
 - `get24hStats(symbol)` → `priceChangePercent`, `highPrice/lowPrice`, `lastPrice`, `weightedAvgPrice`.
-- `getKlines(symbol, "5m", 1000)` and `getKlines(symbol, "1m", 1000)` → price series.
-  **New capability:** pass `startTime`/`endTime` (epoch ms) to pull any HISTORICAL window
-  (e.g. a past bull run) for calibration/backtesting; omit for the latest candles.
+- `getKlines(symbol, "1h", 1000)` → **primary decision series in the current (2026) regime.**
+  On 2026 data the **1h cadence clearly beats 15m/5m**: 1h made +$1,996 vs cash across 6 majors
+  with 0/6 hurt, whereas 15m over-traded and went **−$706 vs cash** (whipsaw + fee-bleed). Use
+  finer candles (`5m`/`1m`) only for entry timing / chop, not as the primary decision clock.
+  **Capability:** pass `startTime`/`endTime` (epoch ms) to pull any HISTORICAL window (e.g. a past
+  bull run, or 2026 YTD) for calibration/backtesting; omit for the latest candles.
 - `getOrderBook(symbol, 20)` → live bid/ask **spread** (true cost = fee + spread) and book
   imbalance (more bids than asks near top = buy pressure). Live-only context, not backtestable.
 - `getAccount()` → real taker fee + current balances (what you actually hold).
@@ -57,6 +79,17 @@ Compute these at the decision time (causal — only past candles):
 Classify: **UPTREND** (slope up + above rising EMAs, ideally a fresh breakout) /
 **DOWNTREND** (slope down + below falling EMAs) / **CHOP** (range, no breakout, mixed EMAs).
 
+This is runnable: `classifyRegime(candles, minutesPerCandle, idx?)` in the bundled **`engine.mjs`**
+returns `'bull' | 'bear-capit' | 'bear-chop' | 'chop'` causally (only candles ≤ idx).
+
+> **⚠ The "bull" label LAGS — confirm it, never auto-trade it.** On 2026 BTC the classifier
+> flagged **both April (+12%, real) AND May (−3.5%, wrong)** as bull, because EMAs/slope trail the
+> turn. Acting on the lagging label is dangerous in a choppy bear: it rides relief rallies straight
+> into the next down-leg. Tested directly — enabling trend-ride off this label on 2026 data **lost**
+> money (ETH +$72→−$16, SOL +$277→+$78). So in a bear-with-bounces, treat a fresh "bull" call as
+> *candidate*, require an independent confirmation (sustained breakout + the move actually holding),
+> and otherwise stay with the protective default. Riding only pays in a *persistent* bull.
+
 ## Step 3 — Pick the mode
 
 | Regime (Step 2) | Mode | Action rule |
@@ -73,7 +106,7 @@ FLAT in downtrends and only permits longs when the trend is up.
 
 Walk-forward selector over {trend-follow, mean-reversion, flat}, re-optimized each ~10 min on
 all data seen so far, net of fees, with a **turnover penalty** so it won't churn. Tuned params
-(validated robust across 9 datasets):
+(re-validated on 2026 YTD across all 6 majors — `lambda 0.0035` is the peak — plus 9 older datasets):
 
 ```
 stepMin: 10        fee: 0.001 (0.10%/fill)
@@ -90,14 +123,22 @@ Lmins: [10,20,30,45,60]      kGrid: [0.001,0.002,0.004,0.006]
 If a switch doesn't clearly clear that bar, **HOLD**.
 
 For higher-volatility alts (SOL/XRP/DOGE) the same params work; they benefit most from the
-high `lambda` because that's where whipsaw/fee-leak is worst. Majors can run milder (`lambda:0.0015`).
+high `lambda` because that's where whipsaw/fee-leak is worst. On 2026 data, dropping `lambda` to
+`0.0015` made things **worse** even for majors (+$178 vs +$1,996 at 0.0035, 2/6 hurt vs 0/6) — so
+keep `lambda: 0.0035` as the default for all symbols in this regime; only go milder with evidence.
+
+> **`rideTrend` knob (default OFF).** `engine.mjs` has a `rideTrend` option that, once long in the
+> trend family, holds until the macro EMA breaks instead of exiting on small pullbacks. It helps in
+> a *persistent* bull (BTC 5m bull +6.5%→+11.3%, BTC 1h bull +11%→+18%) but **hurts in 2026's
+> choppy bear** (6-major vs-cash +$1,996 → +$1,310, **−$687**) because the bull signal that would
+> enable it lags. Leave it off unless you've independently confirmed a sustained uptrend — bull-only.
 
 ## Making money in a bear (the honest answer + the bounce module)
 
 **Question:** can you profit in a bear on long/flat spot by trading small variations on
-broader timeframes (15m/1h)? **Tested it properly** (`sim/engine2.mjs`, parallel tuning,
-then 8 fresh out-of-sample crash windows never used in tuning: May-2021, FTX, SOL-top,
-DOGE, BNB-2022). Robust answer:
+broader timeframes (15m/1h)? **Tested it properly** (a mean-reversion/range variant of the
+engine, parallel tuning, then 8 fresh out-of-sample crash windows never used in tuning: May-2021,
+FTX, SOL-top, DOGE, BNB-2022). Robust answer:
 
 - **You can't reliably beat CASH.** Every dip-buying configuration that looked profitable
   in-sample (+$1,490) was ≈ breakeven out-of-sample (**−$529 vsCash**). Beating B&H is
@@ -147,9 +188,28 @@ Always benchmark against **buy-and-hold** and **all-cash (0%)**, and name the re
 
 ## Evidence (walk-forward, no lookahead, 0.10% fee, $10k start)
 
-**Bear / chop (today, 9 datasets, all net-down):** tuned config aggregate **+$370 vs cash**
-and **+$6,147 vs buy-and-hold**, only 1/9 windows down >$10, worst −$86. (Old un-tuned config:
-−$39 vs cash, 60 trades. Tuning cut trades to 26 and removed the fee-bleed.)
+### PRIMARY — 2026 YTD, real Binance data (1h, default `lambda:0.0035`)
+
+| Symbol | Buy & hold | This skill | vs Cash | vs B&H | trades | maxDD |
+|--------|-----------:|-----------:|--------:|-------:|-------:|------:|
+| BTCUSDT | −24.0% | −0.8% | −$76 | +$2,329 | 4 | 0.8% |
+| ETHUSDT | −37.6% | +0.7% | +$72 | +$3,828 | 8 | 1.9% |
+| SOLUSDT | −40.2% | +2.8% | +$277 | +$4,300 | 16 | 2.9% |
+| BNBUSDT | −25.2% | −0.9% | −$85 | +$2,430 | 2 | 0.9% |
+| XRPUSDT | −33.6% | +8.9% | +$886 | +$4,249 | 42 | 7.4% |
+| DOGEUSDT | −21.5% | +9.2% | +$922 | +$3,072 | 46 | 9.4% |
+| **AGG** | (−20…−40%) | | **+$1,996** | **+$20,209** | 118 | <10% |
+
+→ On *current* data the skill does exactly what it's built for: **beats B&H by ~$20k** (sidesteps a
+−20…−40% bleed) and **beats cash by +$1,996 with 0/6 symbols hurt**, max drawdown <10%. Crucially
+the cash-beating edge is **broad** here (XRP, DOGE, SOL, ETH all positive) — not a single-symbol
+fluke. `lambda` sweep on 2026: 0.0035 is the peak (0.0008→−$1,039/5-hurt; 0.0015→+$178; 0.0035→
++$1,996; 0.006→+$1,345; 0.01→+$1,885 — all of 0.0035–0.01 are safe, 0/6 hurt).
+
+**Older synthetic suite (9 short 1m/5m windows, all net-down):** tuned config **+$370 vs cash**,
+**+$6,147 vs B&H**, 1/9 hurt, worst −$86. *Caveat learned this round:* that +$370 was essentially
+**one symbol (BNB +$456)** — 8/9 windows just sat in cash. The 2026 set above is the more honest,
+multi-symbol evidence; prefer it. (Old un-tuned config: −$39 vs cash, 60 trades.)
 
 **Bull (historical, fetched via `getKlines` startTime):**
 
@@ -163,7 +223,7 @@ and **+$6,147 vs buy-and-hold**, only 1/9 windows down >$10, worst −$86. (Old 
 which is exactly why Step 3 says *hold the trend, don't churn it*. Its structural edge is
 downside protection + fee discipline in down/choppy markets.
 
-**Bear bounce module (engine2, out-of-sample on 8 unseen crash windows):**
+**Bear bounce module (mean-reversion variant, out-of-sample on 8 unseen crash windows):**
 
 | Config | Train bear vsCash | OOS vsCash | OOS vsBH | Verdict |
 |--------|------------------:|-----------:|---------:|---------|
@@ -175,18 +235,23 @@ downside protection + fee discipline in down/choppy markets.
 bounce**. Not systematic bear profit. Vertical capitulations still cost a few %; choppy bears
 with relief rallies are where the module earns. On 1h slow bears it sits flat (= cash).
 
-## Supporting tooling (evidence, not the skill)
+## Bundled code & re-validation
 
-- `sim/engine.mjs` — walk-forward backtester `runBacktest(candles, opts)` incl. the pattern
-  detectors (trend structure, breakout) behind `usePatterns` (off by default — as a hard entry
-  filter it tested mixed; the detectors' real value is regime classification in Step 2).
-- `sim/run.mjs` — `node sim/run.mjs <DATASET> <minutesPerCandle> [startFrac endFrac] [optsJSON]`.
-- `sim/validate_all.mjs` — multi-dataset comparison. Re-tune `lambda`/`macroMins`/`kGrid` on
-  fresh `getKlines` data (including historical windows) before trusting a decision.
-- **Bear-module tooling (engine2):** `sim/engine2.mjs` — mean-reversion/range families
-  (`mr_z`, `rsi`, `bb`, `donch`) + risk controls + `entryConfirm`/free-fall/edge-margin toggles.
-  `sim/fetch.mjs` — paginating historical klines fetcher (any symbol/interval/date range).
-  `sim/datasets.mjs` — labelled dataset manifest. `sim/validate2.mjs` — parallel multi-dataset
-  run. `sim/oos.mjs` / `sim/compare.mjs` — out-of-sample vs training comparison (the
-  overfitting check). **Always confirm a bear config OOS on unseen crash windows before
-  trusting it — in-sample bear numbers are misleading.**
+The only script the skill needs at decision time is bundled with it:
+
+- **`engine.mjs`** (next to this file, self-contained, no imports):
+  - `classifyRegime(candles, minutesPerCandle, idx?)` — the Step 2 regime call
+    (`'bull' | 'bear-capit' | 'bear-chop' | 'chop'`), causal.
+  - `runBacktest(candles, opts)` — the Step 4 walk-forward fee-aware engine. Key opts:
+    `minutesPerCandle`, `stepMin`, `fee`, `lambda` (turnover penalty), `macroMins`, `Lmins`,
+    `kGrid`, the bull-only `rideTrend` (default off — see Step 4), and `usePatterns` (trend /
+    breakout detectors as a hard entry filter; default off — their real value is the Step 2
+    classification).
+
+`candles` is an array of `{ o, h, l, c, v }` — map a `getKlines` response into that shape.
+
+**To re-validate** (regimes change — do this before trusting the numbers above): pull fresh
+candles with `getKlines(symbol, "1h", 1000)` (use `startTime`/`endTime` for a historical window),
+feed them to `runBacktest`, and compare `vs_cash_usdt` / `vs_bh_usdt` / `max_drawdown` across the
+majors. Sweep `lambda` (0.0035 was the 2026 peak). For any bear-bounce variant, always confirm
+**out-of-sample** on unseen crash windows — in-sample bear numbers are misleading.

@@ -14,4 +14,11 @@ export const DATASETS = [
   ['BTCUSDT_1h_chop2023', 60, 'chop'],
   // controls — must not destroy bull performance
   ['BTCUSDT_1h_bull2024', 60, 'bull'],
+  // 2026 YTD (real data, primary validation set — broad bear w/ a Mar-Apr relief rally)
+  ['BTCUSDT_1h_2026ytd', 60, 'bear'],
+  ['ETHUSDT_1h_2026ytd', 60, 'bear'],
+  ['SOLUSDT_1h_2026ytd', 60, 'bear'],
+  ['BNBUSDT_1h_2026ytd', 60, 'bear'],
+  ['XRPUSDT_1h_2026ytd', 60, 'bear'],
+  ['DOGEUSDT_1h_2026ytd', 60, 'bear'],
 ];

@@ -1,4 +1,4 @@
-// Entry point for testing the spot-trade-decision skill on a dataset.
+// Entry point for testing the crypto-specific-skills skill on a dataset.
 // Usage:
 //   node sim/run.mjs <datasetName> <minutesPerCandle> [startFrac] [endFrac] [optsJSON]
 // e.g.
