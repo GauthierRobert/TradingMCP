@@ -2,11 +2,11 @@
   "meta": {
     "version": 2,
     "updated": "2026-06-03T21:05:22.193Z",
-    "note": "Seed grid for BINANCE spot — UNVALIDATED. Active arm starts FLAT (A0). Run `node run.mjs learn <SYM> <days>` to score the trading arms on real recent 5m Binance bars; the bandit only leaves FLAT if a trading arm shows a positive net-of-fee EW mean. Binance fees (0.10%/fill) are far lower than Alpaca's, so an arm can clear the floor more easily here — but do not assume it will; let the learner prove it.",
+    "note": "Seed grid for BINANCE spot — UNVALIDATED. Active arm starts FLAT (A0). Run `node run.mjs learn <SYM> <days>` to score the trading arms on real recent 1m Binance bars; the bandit only leaves FLAT if a trading arm shows a positive net-of-fee EW mean. Binance fees (0.10%/fill) are far lower than Alpaca's, so an arm can clear the floor more easily here — but do not assume it will; let the learner prove it.",
     "lastLearn": "2026-06-03T21:05:22.193Z"
   },
   "config": {
-    "timeframe": "5m",
+    "timeframe": "1m",
     "makerFee": 0.001,
     "takerFee": 0.001,
     "spreadEst": 0.0003,

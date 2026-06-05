@@ -1,12 +1,12 @@
 ---
 name: alpaca-aggressive-scalper
-description: VERY AGGRESSIVE 5-minute long/flat crypto scalper for Alpaca that takes every qualifying momentum setup fast — but is kept survivable by three research-backed levers: MAKER-FIRST execution (post-only limit orders pay Alpaca's 0.15% maker fee, not 0.25% taker, ~halving the round-trip cost), an ATR volatility gate (only fire when the expected move clears the fee floor), and live order-book imbalance confirmation. ATR-adaptive take-profit/stop/trail, momentum-burst + micro-breakout entries, near-zero cooldown. A counterfactual bandit scores a grid of aggressive arms (plus a FLAT safety arm) on real bars + paper fills and self-tunes. Fee-aware. Targets the Alpaca PAPER account; independent of the other Alpaca skills.
+description: VERY AGGRESSIVE 1-minute long/flat crypto scalper for Alpaca that takes every qualifying momentum setup fast — but is kept survivable by three research-backed levers: MAKER-FIRST execution (post-only limit orders pay Alpaca's 0.15% maker fee, not 0.25% taker, ~halving the round-trip cost), an ATR volatility gate (only fire when the expected move clears the fee floor), and live order-book imbalance confirmation. ATR-adaptive take-profit/stop/trail, momentum-burst + micro-breakout entries, near-zero cooldown. A counterfactual bandit scores a grid of aggressive arms (plus a FLAT safety arm) on real bars + paper fills and self-tunes. Fee-aware. Targets the Alpaca PAPER account; independent of the other Alpaca skills.
 allowed-tools: mcp__alpaca__get_crypto_snapshot, mcp__alpaca__get_crypto_bars, mcp__alpaca__get_crypto_latest_bar, mcp__alpaca__get_crypto_latest_quote, mcp__alpaca__get_crypto_latest_orderbook, mcp__alpaca__get_account_info, mcp__alpaca__get_all_positions, mcp__alpaca__get_open_position, mcp__alpaca__get_orders, mcp__alpaca__place_crypto_order, mcp__alpaca__close_position, mcp__alpaca__cancel_order_by_id, mcp__alpaca__cancel_all_orders, Read, Write, Bash
 ---
 
-# Aggressive scalper — fast 5-minute momentum, made survivable by maker-first fees
+# Aggressive scalper — fast 1-minute momentum, made survivable by maker-first fees
 
-A **very aggressive** short-term engine. On every 5-minute bar it takes **every qualifying
+A **very aggressive** short-term engine. On every 1-minute bar it takes **every qualifying
 momentum setup** — momentum bursts, micro-breakouts, and pullback-continuations — with a
 near-zero cooldown so it never waits out a window. That is the aggression. What keeps aggression
 from being suicidal is **fee discipline built from deep research**, not timidity.
@@ -18,15 +18,15 @@ order-book imbalance** confirmation those skills don't have.
 
 > **Mode: PAPER account, auto-trading via Claude `/loop`.** Runs on the **Alpaca paper account**
 > (real paper fills feed the learner). `tick` returns a ready-to-execute plan; Claude places the
-> **paper** orders via the Alpaca MCP each 5-min tick. **No live-money trading** until you
+> **paper** orders via the Alpaca MCP each 1-min tick. **No live-money trading** until you
 > deliberately point it at a live server and confirm.
 
 ## The deep research — why "aggressive" usually loses, and the three levers that change the math
 
-Naive 5-minute scalping **cannot beat the fee floor** — the `alpaca-adaptive-scalper` measured this
+Naive 1-minute scalping **cannot beat the fee floor** — the `alpaca-adaptive-scalper` measured this
 across a +52% bull and recent chop, and this skill reproduced it (table below). Turnover is the
 enemy: each round trip must clear cost, and at base-tier all-taker that cost is **~0.56%**
-(0.25%×2 + ~0.06% spread). Most 5-min edges are smaller than that. So aggression only works if you
+(0.25%×2 + ~0.06% spread). Most 1-min edges are smaller than that. So aggression only works if you
 **lower the cost floor** and **only act when the move is big enough**. Three research-backed levers:
 
 **1. MAKER-FIRST execution — the single biggest lever.** Alpaca crypto fees are tiered
@@ -57,6 +57,10 @@ Sources: [Alpaca crypto fees](https://docs.alpaca.markets/us/docs/crypto-fees) �
 [order-book microstructure](https://www.coinapi.io/blog/is-crypto-scalping-still-profitable-2025-coinapi-data-driven-insights).
 
 ## Read this first — the honest evidence (measured 2026-06-03, real Alpaca 5Min bars)
+
+> **The live clock is now 1Min** (changed from 5Min). The table below was measured on **5Min** bars —
+> the *kinder* baseline. The 1-minute clock turns over ~5× faster, so the bleed below is a **lower
+> bound**: expect it worse at 1 minute. Re-run `learn` to re-measure on real 1Min bars.
 
 `node run.mjs learn "BTC/USD" 14` over **4,032 real 5Min bars**, fees modelled maker-first:
 
@@ -99,7 +103,7 @@ Compute on the last bar (arrays precomputed once):
 
 ## The self-learning loop (real + fictive feedback)
 
-Each `learn` pass: (1) every arm is **counterfactually simulated** on the recent 5Min window, each
+Each `learn` pass: (1) every arm is **counterfactually simulated** on the recent 1Min window, each
 shadow trade's **net-of-fee P&L** (maker cost for TP exits, taker cost for stop exits) is the
 reward; (2) actual paper fills logged via `closed` are folded into the arm that produced them,
 weighted **×`realWeight`** (3); (3) a **discounted EW-mean bandit** ranks arms — live `decide`
@@ -121,7 +125,7 @@ node run.mjs closed "ETH/USD" 1875 take-profit      # record a SELL fill (px exi
 # --- manual / inspection ---
 node run.mjs decide "BTC/USD" [long entryPx peakSince heldBars atrPctEntry]   # FAST live signal (active arm)
 node run.mjs scan   "BTC/USD,ETH/USD,SOL/USD"       # any BUY setups now? (best trading arm; shows atr%/rsi/obi)
-node run.mjs learn  "BTC/USD" 14                     # re-score arms on real 5Min bars + self-modify
+node run.mjs learn  "BTC/USD" 14                     # re-score arms on real 1Min bars + self-modify
 node run.mjs size   "BTC/USD" 100000                 # ATR-risk notional (risk 2.5% equity off the stop)
 node run.mjs arms / status                           # arm grid + bandit stats / config + changelog
 ```
@@ -132,11 +136,11 @@ plus `buyConsensus` and the maker/taker round-trip costs. Pass `long <entryPx> <
 
 ## Autopilot — fully automated via Claude `/loop` (paper account)
 
-The whole 5-minute cycle is **one cheap node call** (`tick`); Claude executes the named orders via
+The whole 1-minute cycle is **one cheap node call** (`tick`); Claude executes the named orders via
 the Alpaca MCP and writes the fills back. Start it with:
 
 ```
-/loop 5m Autopilot the alpaca-aggressive-scalper on BTC/USD,ETH/USD (Alpaca paper). Each tick run `node run.mjs tick "BTC/USD,ETH/USD" <equity>`; for every plan item action BUY place the POST-ONLY limit order via Alpaca MCP place_crypto_order (type=limit, limit_price=order.price, time_in_force=gtc) then `node run.mjs opened <SYM> <fillPx> <fillQty> <arm> <atrPctEntry>`; for action SELL close_position via MCP then `node run.mjs closed <SYM> <fillPx> <reason>`; if learnDue run the learnHint; append one line to _state/SESSIONS.md.
+/loop 1m Autopilot the alpaca-aggressive-scalper on BTC/USD,ETH/USD (Alpaca paper). Each tick run `node run.mjs tick "BTC/USD,ETH/USD" <equity>`; for every plan item action BUY place the POST-ONLY limit order via Alpaca MCP place_crypto_order (type=limit, limit_price=order.price, time_in_force=gtc) then `node run.mjs opened <SYM> <fillPx> <fillQty> <arm> <atrPctEntry>`; for action SELL close_position via MCP then `node run.mjs closed <SYM> <fillPx> <reason>`; if learnDue run the learnHint; append one line to _state/SESSIONS.md; if clearDue is true, run /clear LAST (after everything else) to reset context.
 ```
 
 Each tick, Claude does exactly:
@@ -150,6 +154,9 @@ Each tick, Claude does exactly:
    - **HOLD** → do nothing.
 3. If `learnDue` (≈ hourly), run the `learnHint` — re-tunes + self-modifies the arm grid.
 4. Append one line to `_state/SESSIONS.md`.
+5. **If `clearDue` is true** (every 20th tick ≈ 20 min), run **`/clear`** as the *last* action of the
+   tick — it resets the session context so the loop stays cheap. State lives in `_state/`, so `/clear`
+   loses nothing; the next `/loop` tick re-injects these instructions automatically.
 
 **Position memory:** `tick` reads/writes `_state/positions.json`, recomputing peak-since-entry and
 bars-held each tick (and carrying `atrPctEntry`), so the ATR-adaptive exits work across ticks. An

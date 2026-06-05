@@ -1,13 +1,13 @@
 ---
 name: binance-aggressive-scalper
-description: VERY AGGRESSIVE 5-minute long/flat crypto scalper for BINANCE spot — takes every qualifying momentum setup fast, kept survivable by a fee-aware design ported from the Alpaca aggressive scalper. LIMIT_MAKER (post-only) entries, an ATR volatility gate (only fire when the expected move clears the fee floor), and live order-book imbalance confirmation. ATR-adaptive take-profit/stop/trail, momentum-burst + micro-breakout entries, near-zero cooldown. A counterfactual bandit scores a grid of aggressive arms (plus a FLAT safety arm) on real 5m klines + fills and self-tunes. Fee-aware (Binance 0.10% maker==taker). SIMULATION-ONLY by default (BINANCE_TRADING_ENABLED=false); independent state from the other skills. For Alpaca crypto, use alpaca-aggressive-scalper instead.
+description: VERY AGGRESSIVE 1-minute long/flat crypto scalper for BINANCE spot — takes every qualifying momentum setup fast, kept survivable by a fee-aware design ported from the Alpaca aggressive scalper. LIMIT_MAKER (post-only) entries, an ATR volatility gate (only fire when the expected move clears the fee floor), and live order-book imbalance confirmation. ATR-adaptive take-profit/stop/trail, momentum-burst + micro-breakout entries, near-zero cooldown. A counterfactual bandit scores a grid of aggressive arms (plus a FLAT safety arm) on real 1m klines + fills and self-tunes. Fee-aware (Binance 0.10% maker==taker). SIMULATION-ONLY by default (BINANCE_TRADING_ENABLED=false); independent state from the other skills. For Alpaca crypto, use alpaca-aggressive-scalper instead.
 allowed-tools: mcp__binance__getPrice, mcp__binance__getKlines, mcp__binance__getOrderBook, mcp__binance__get24hStats, mcp__binance__getAccount, mcp__binance__getOpenOrders, mcp__binance__getOrder, mcp__binance__getMyTrades, mcp__binance__placeOrder, mcp__binance__cancelOrder, mcp__binance__getExchangeInfo, Read, Write, Bash
 ---
 
-# Binance aggressive scalper — fast 5-minute momentum, fee-honest
+# Binance aggressive scalper — fast 1-minute momentum, fee-honest
 
 The **Binance spot port** of `alpaca-aggressive-scalper`. Same very-aggressive engine: on every
-5-minute bar it takes **every qualifying momentum setup** — bursts, micro-breakouts, pullback-
+1-minute bar it takes **every qualifying momentum setup** — bursts, micro-breakouts, pullback-
 continuations — with a near-zero cooldown. The strategy logic (`engine.mjs`) is **identical and
 shared in design**; only the **data source** (Binance public REST), **symbols** (`BTCUSDT`), and
 the **fee model** differ. It keeps its own `_state/` so it learns independently.
@@ -39,6 +39,11 @@ certainty; entries stay **LIMIT_MAKER** for the price-improvement + no-taker gua
 
 ## Read this first — the honest evidence (measured 2026-06-03, real Binance 5m klines)
 
+> **The live clock is now 1m** (changed from 5m). The table below was measured on **5m** klines — the
+> *kinder* baseline. A 1-minute clock turns over ~5× faster, so the bleed below is a **lower bound**:
+> expect it worse at 1 minute (Binance's lower floor softens it, not erases it). Re-run `learn` to
+> re-measure on real 1m klines.
+
 `node run.mjs learn "BTCUSDT" 14` over **4,032 real 5m bars**:
 
 | Arm | trades | win% | net sumPnl | verdict |
@@ -49,7 +54,7 @@ certainty; entries stay **LIMIT_MAKER** for the price-improvement + no-taker gua
 | A4 expansion-gated | 1 | 100% | +0.18% | barely traded (gate selective); 1 sample ≠ proof |
 | **A0 FLAT (safety)** | — | — | **0%** | **bandit promoted this — the honest winner** |
 
-Same lesson as Alpaca: **aggressive 5-min scalping bleeds in chop**, even with Binance's lower floor.
+Same lesson as Alpaca: **aggressive scalping bleeds in chop**, even with Binance's lower floor.
 The bandit correctly **demoted A1 → A0 (FLAT)** on the first pass. **Treat any positive edge as
 unproven until live/paper fills confirm it.** The value is the *harness*: it deploys an aggressive
 arm **only** when one earns it on recent real bars, and otherwise preserves capital. It ships seeded
@@ -73,7 +78,7 @@ node run.mjs opened "ETHUSDT" 1860 0.5 A1 0.0012    # record a BUY fill (px qty 
 node run.mjs closed "ETHUSDT" 1875 take-profit      # record a SELL fill (px exitReason) -> logs net pnl
 node run.mjs decide "BTCUSDT" [long entryPx peakSince heldBars atrPctEntry]   # FAST live signal
 node run.mjs scan   "BTCUSDT,ETHUSDT,DOTUSDT,SOLUSDT,AVAXUSDT,XRPUSDT,LINKUSDT"  # any BUY setups now? (atr%/rsi/obi)
-node run.mjs learn  "BTCUSDT" 14                     # re-score arms on real 5m klines + self-modify
+node run.mjs learn  "BTCUSDT" 14                     # re-score arms on real 1m klines + self-modify
 node run.mjs size   "BTCUSDT" 1000                  # ATR-risk notional (risk 2.5% equity off the stop)
 node run.mjs arms / status                           # arm grid + bandit stats / config + changelog
 ```
@@ -82,12 +87,12 @@ Symbols are **Binance-native** (`BTCUSDT`, `ETHUSDT`, no slash). Equity is in US
 
 ## Autopilot — via Claude `/loop` (simulation by default)
 
-The whole 5-minute cycle is one cheap `tick` call; Claude executes the named orders via the Binance
+The whole 1-minute cycle is one cheap `tick` call; Claude executes the named orders via the Binance
 MCP and writes fills back. Default universe is 7 USDT pairs (BTC, ETH, DOT, SOL, AVAX, XRP, LINK).
 Start it with:
 
 ```
-/loop 5m Autopilot the binance-aggressive-scalper on BTCUSDT,ETHUSDT,DOTUSDT,SOLUSDT,AVAXUSDT,XRPUSDT,LINKUSDT (Binance spot, SIM unless trading enabled). Each tick run `node run.mjs tick "BTCUSDT,ETHUSDT,DOTUSDT,SOLUSDT,AVAXUSDT,XRPUSDT,LINKUSDT" <equity>` in .claude/skills/binance-aggressive-scalper; for every plan item action BUY place the order via order.execute (mcp__binance__placeOrder LIMIT_MAKER) then `node run.mjs opened <SYM> <fillPx> <fillQty> <arm> <atrPctEntry>`; for action SELL place the MARKET sell via order.execute then `node run.mjs closed <SYM> <fillPx> <reason>`; if learnDue run the learnHint; append one line to _state/SESSIONS.md.
+/loop 1m Autopilot the binance-aggressive-scalper on BTCUSDT,ETHUSDT,DOTUSDT,SOLUSDT,AVAXUSDT,XRPUSDT,LINKUSDT (Binance spot, SIM unless trading enabled). Each tick run `node run.mjs tick "BTCUSDT,ETHUSDT,DOTUSDT,SOLUSDT,AVAXUSDT,XRPUSDT,LINKUSDT" <equity>` in .claude/skills/binance-aggressive-scalper; for every plan item action BUY place the order via order.execute (mcp__binance__placeOrder LIMIT_MAKER) then `node run.mjs opened <SYM> <fillPx> <fillQty> <arm> <atrPctEntry>`; for action SELL place the MARKET sell via order.execute then `node run.mjs closed <SYM> <fillPx> <reason>`; if learnDue run the learnHint; append one line to _state/SESSIONS.md; if clearDue is true, run /clear LAST (after everything else) to reset context.
 ```
 
 > **Sizing note with 7 pairs:** each entry is risk-sized (2.5% equity off the stop) and capped at
@@ -106,6 +111,9 @@ Each tick, Claude does exactly:
    - **HOLD** → do nothing.
 3. If `learnDue` (≈ hourly), run the `learnHint`.
 4. Append one line to `_state/SESSIONS.md`.
+5. **If `clearDue` is true** (every 20th tick ≈ 20 min), run **`/clear`** as the *last* action of the
+   tick — it resets the session context so the loop stays cheap. State lives in `_state/`, so `/clear`
+   loses nothing; the next `/loop` tick re-injects these instructions automatically.
 
 **Position memory:** `tick` reads/writes `_state/positions.json`, recomputing peak-since-entry and
 bars-held each tick, so the ATR-adaptive exits work across ticks. An open position is always managed

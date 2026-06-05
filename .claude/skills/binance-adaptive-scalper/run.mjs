@@ -1,9 +1,9 @@
-// CLI for binance-adaptive-scalper. Fetches public Binance 5m klines (no auth)
+// CLI for binance-adaptive-scalper. Fetches public Binance 1m klines (no auth)
 // and drives the self-learning scalper. FAST: one small fetch, simple math.
 //
 //   node run.mjs decide  "BTCUSDT" [long entryPx peakSince heldBars]   # live signal (active arm)
 //   node run.mjs scan    "BTCUSDT,ETHUSDT"                             # quick multi-pair BUY scan
-//   node run.mjs learn   "BTCUSDT" 14                                  # score arms on real 5m bars + self-modify
+//   node run.mjs learn   "BTCUSDT" 14                                  # score arms on real 1m bars + self-modify
 //   node run.mjs arms                                                  # show the arm grid + bandit stats
 //   node run.mjs status                                               # active arm, config, recent changelog
 //   node run.mjs size    "BTCUSDT" 100000                              # risk-based notional off active arm's stop
@@ -13,12 +13,16 @@
 //   node run.mjs closed  "ETHUSDT" 1875                                # record an executed SELL fill -> logs net pnl
 import { liveSignal, learnAndEvolve, selectActiveArm, selectTradingArm, loadState, saveState, logDecision,
   recordOutcome, readRealOutcomes, getArm, roundTripCost, feeFloor, loadPositions, savePositions } from './scalper.mjs';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+const TICKS_FILE = join(dirname(fileURLToPath(import.meta.url)), '_state', 'loop_ticks.txt');
 
 // ---- Binance public market data (klines). No API key needed for market data. ----
 // Multiple hosts for geo-resilience; data-api.binance.vision is the public market-data mirror.
 const HOSTS = ['https://api.binance.com', 'https://data-api.binance.vision', 'https://api-gcp.binance.com'];
-const INTERVAL = '5m';
-const BAR_MS = 5 * 60 * 1000;
+const INTERVAL = '1m';
+const BAR_MS = 1 * 60 * 1000;
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 // Normalize a symbol to Binance form: "BTC/USDT" | "btcusdt" | "BTC/USD" -> "BTCUSDT".
 function normSym(s) {
@@ -45,7 +49,7 @@ async function klinesPage(symbol, { startTime, endTime, limit = 1000 } = {}) {
   throw lastErr || new Error(`klines failed for ${symbol}`);
 }
 // Returns [{o,h,l,c,v,t}] with t as ISO string (so the engine's lexicographic t-compares work).
-async function fetchBars(symbol, _tf = '5m', { limit = 5000, start, end } = {}) {
+async function fetchBars(symbol, _tf = '1m', { limit = 30000, start, end } = {}) {
   const sym = normSym(symbol);
   let startTime = start ? Date.parse(start) : (Date.now() - 3 * 864e5);
   const endTime = end ? Date.parse(end) : Date.now();
@@ -70,12 +74,12 @@ const state = NEEDS_STATE.includes(cmd) ? loadState() : null;
 if (cmd === 'decide') {
   const sym = normSym(args[0] || 'BTCUSDT');
   const position = { long: args[1] === 'long', entryPx: +(args[2] || 0), peakSince: +(args[3] || 0), heldBars: +(args[4] || 0) };
-  const candles = await fetchBars(sym, '5m', { start: daysAgoISO(3) });          // ~3 days of 5m = plenty for EMA50
+  const candles = await fetchBars(sym, '1m', { start: daysAgoISO(3) });          // ~3 days of 1m = plenty for EMA50
   const armId = selectActiveArm(state); const arm = getArm(state, armId);
   const sig = liveSignal(candles, position, arm.knobs, state.config);
   // light consensus: how many arms agree on a BUY right now (entry conviction)
   let buyVotes = 0; for (const a of state.arms) { const s = liveSignal(candles, { long: false }, a.knobs, state.config); if (s.action === 'BUY') buyVotes++; }
-  const out = { symbol: sym, timeframe: '5m', bars: candles.length, lastBarTime: candles[candles.length - 1]?.t,
+  const out = { symbol: sym, timeframe: '1m', bars: candles.length, lastBarTime: candles[candles.length - 1]?.t,
     activeArm: armId, position, signal: sig, buyConsensus: `${buyVotes}/${state.arms.length} arms`,
     feeFloorPct: +(feeFloor(state.config) * 100).toFixed(3), roundTripCostPct: +(roundTripCost(state.config) * 100).toFixed(3) };
   logDecision({ sym, armId, action: sig.action, reason: sig.reason, price: sig.price, buyVotes });
@@ -83,12 +87,12 @@ if (cmd === 'decide') {
 }
 
 if (cmd === 'scan') {
-  const symbols = (args[0] || 'BTCUSDT,ETHUSDT,DOTUSDT,SOLUSDT,AVAXUSDT,XRPUSDT,LINKUSDT').split(',').map(normSym);
+  const symbols = (args[0] || 'BTCUSDT,ETHUSDT,SOLUSDT,AVAXUSDT,LINKUSDT,LTCUSDT,BCHUSDT,DOGEUSDT,DOTUSDT,XRPUSDT,AAVEUSDT,UNIUSDT').split(',').map(normSym);
   const armId = selectTradingArm(state); const arm = getArm(state, armId);   // best TRADING arm, even if live posture is FLAT
   const live = selectActiveArm(state);
-  console.log(`=== 5m BUY scan — best trading arm ${armId} (live posture: ${live}${live === 'A0' ? ' = FLAT' : ''}) ===`);
+  console.log(`=== 1m BUY scan — best trading arm ${armId} (live posture: ${live}${live === 'A0' ? ' = FLAT' : ''}) ===`);
   for (const sym of symbols) {
-    const candles = await fetchBars(sym, '5m', { start: daysAgoISO(3) });
+    const candles = await fetchBars(sym, '1m', { start: daysAgoISO(3) });
     const sig = liveSignal(candles, { long: false }, arm.knobs, state.config);
     const tag = sig.action === 'BUY' ? `*** BUY  tgt ${sig.target} stop ${sig.stop}` : `${sig.action} (${sig.reason})`;
     console.log(`${sym.padEnd(10)} @ ${String(sig.price).padStart(10)}  rsi ${String(sig.rsi ?? '-').padStart(5)}  -> ${tag}`);
@@ -98,12 +102,12 @@ if (cmd === 'scan') {
 if (cmd === 'learn') {
   const sym = normSym(args[0] || 'BTCUSDT');
   const days = +(args[1] || 14);
-  const candles = await fetchBars(sym, '5m', { start: daysAgoISO(days) });
+  const candles = await fetchBars(sym, '1m', { start: daysAgoISO(days) });
   const real = readRealOutcomes();
   const res = learnAndEvolve(state, candles, real);
   state.meta.lastLearn = new Date().toISOString();
   saveState(state);
-  console.log(`=== learn ${sym} ${days}d (${candles.length} 5m bars, ${real.length} real fills folded in) ===`);
+  console.log(`=== learn ${sym} ${days}d (${candles.length} 1m bars, ${real.length} real fills folded in) ===`);
   console.log(`leader ${res.leader} | active arm -> ${res.active}`);
   console.log(res.changes.length ? 'changes:\n  ' + res.changes.join('\n  ') : 'no structural change this pass');
   console.log('\narm                ewMean    trades  win%   sumPnl%');
@@ -135,7 +139,7 @@ if (cmd === 'size') {
   const sym = normSym(args[0] || 'BTCUSDT');
   const equity = +(args[1] || 100000);
   const arm = getArm(state, selectTradingArm(state));    // size a hypothetical entry off the best trading arm's stop
-  const candles = await fetchBars(sym, '5m', { start: daysAgoISO(1) });
+  const candles = await fetchBars(sym, '1m', { start: daysAgoISO(1) });
   const price = candles[candles.length - 1].c;
   const stopPct = arm.knobs.stopPct;
   const riskDollars = equity * state.config.riskPct;
@@ -158,16 +162,16 @@ if (cmd === 'record') {
   console.log('note: run `node run.mjs learn` to fold this into the bandit.');
 }
 
-// ---------- AUTOPILOT: one cheap call per 5-min tick -> a ready-to-execute plan ----------
+// ---------- AUTOPILOT: one cheap call per 1-min tick -> a ready-to-execute plan ----------
 if (cmd === 'tick') {
   // tick "BTCUSDT,ETHUSDT,..." [equity]  -> JSON plan; Claude executes the orders via the Binance MCP.
-  const symbols = (args[0] || 'BTCUSDT,ETHUSDT,DOTUSDT,SOLUSDT,AVAXUSDT,XRPUSDT,LINKUSDT').split(',').map(normSym);
+  const symbols = (args[0] || 'BTCUSDT,ETHUSDT,SOLUSDT,AVAXUSDT,LINKUSDT,LTCUSDT,BCHUSDT,DOGEUSDT,DOTUSDT,XRPUSDT,AAVEUSDT,UNIUSDT').split(',').map(normSym);
   const equity = +(args[1] || 100000);
   const positions = loadPositions();
   const activeId = selectActiveArm(state);
   const plan = [];
   for (const sym of symbols) {
-    const candles = await fetchBars(sym, '5m', { start: daysAgoISO(3) });
+    const candles = await fetchBars(sym, '1m', { start: daysAgoISO(3) });
     const last = candles[candles.length - 1];
     const held = positions[sym] && positions[sym].long ? positions[sym] : null;
     if (held) {
@@ -199,7 +203,10 @@ if (cmd === 'tick') {
   savePositions(positions);
   const lastLearn = state.meta.lastLearn ? Date.parse(state.meta.lastLearn) : 0;
   const learnDue = (Date.now() - lastLearn) > 55 * 60 * 1000;   // run learn ~hourly
-  console.log(JSON.stringify({ ts: new Date().toISOString(), venue: 'binance', equity, activeArm: activeId,
+  let ticks = 0; try { ticks = parseInt(readFileSync(TICKS_FILE, 'utf8').trim(), 10) || 0; } catch {}
+  ticks++; try { writeFileSync(TICKS_FILE, String(ticks)); } catch {}
+  const clearDue = ticks % 20 === 0;   // every 20 ticks (~20 min at 1m loop) -> reset Claude's context
+  console.log(JSON.stringify({ ts: new Date().toISOString(), venue: 'binance', equity, activeArm: activeId, ticks, clearDue,
     learnDue, learnHint: learnDue ? `node run.mjs learn "${symbols[0]}" 14` : null, plan }, null, 2));
 }
 
@@ -208,7 +215,7 @@ if (cmd === 'opened') {
   const [symRaw, fillPx, fillQty, armId] = args;
   const sym = normSym(symRaw);
   const positions = loadPositions();
-  const candles = await fetchBars(sym, '5m', { start: daysAgoISO(1) });
+  const candles = await fetchBars(sym, '1m', { start: daysAgoISO(1) });
   positions[sym] = { long: true, entryPx: +fillPx, qty: +fillQty, peak: +fillPx,
     openedAt: new Date().toISOString(), openedBarTime: candles[candles.length - 1]?.t, heldBars: 0,
     armId: armId || selectActiveArm(state) };

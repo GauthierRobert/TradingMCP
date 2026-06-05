@@ -2,11 +2,11 @@
   "meta": {
     "version": 1,
     "updated": "2026-06-03T23:05:00.000Z",
-    "note": "VERY AGGRESSIVE seed grid for BINANCE spot — UNVALIDATED, SIM/paper by default (BINANCE_TRADING_ENABLED=false). Active arm starts on A1 (aggressive momentum); the bandit DEMOTES to A0 (FLAT) the moment no trading arm clears the fee floor on recent real 5m bars (this WILL happen in chop — correct, not a bug). Run `node run.mjs learn <SYM> <days>` to score. Binance fee model: maker == taker == 0.10%/fill (NO maker discount, unlike Alpaca), but tight spreads + low absolute fees give a LOWER round-trip floor (~0.26%) than Alpaca's maker-first (~0.42%). LIMIT_MAKER entries still buy price-improvement + guaranteed no-taker, just not a fee discount. Set makerFee/takerFee to 0.00075 if paying fees in BNB. (First learn on 2026-06-03 over 4032 bars demoted A1->A0; A1 -17%, A2 -16%, A3 -32% — bleeds less than Alpaca's -49/-71% thanks to the lower floor, but still net-negative in chop.)",
+    "note": "VERY AGGRESSIVE seed grid for BINANCE spot — UNVALIDATED, SIM/paper by default (BINANCE_TRADING_ENABLED=false). Active arm starts on A1 (aggressive momentum); the bandit DEMOTES to A0 (FLAT) the moment no trading arm clears the fee floor on recent real 1m bars (this WILL happen in chop — correct, not a bug). Run `node run.mjs learn <SYM> <days>` to score. Binance fee model: maker == taker == 0.10%/fill (NO maker discount, unlike Alpaca), but tight spreads + low absolute fees give a LOWER round-trip floor (~0.26%) than Alpaca's maker-first (~0.42%). LIMIT_MAKER entries still buy price-improvement + guaranteed no-taker, just not a fee discount. Set makerFee/takerFee to 0.00075 if paying fees in BNB. (First learn on 2026-06-03 over 4032 bars demoted A1->A0; A1 -17%, A2 -16%, A3 -32% — bleeds less than Alpaca's -49/-71% thanks to the lower floor, but still net-negative in chop.)",
     "lastLearn": null
   },
   "config": {
-    "timeframe": "5m",
+    "timeframe": "1m",
     "makerFee": 0.001,
     "takerFee": 0.001,
     "spreadEst": 0.0002,

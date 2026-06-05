@@ -1,10 +1,10 @@
 // alpaca-aggressive-scalper — core engine (pure, no network).
 //
-// A VERY AGGRESSIVE 5-minute long/flat crypto scalper that is still fee-honest.
+// A VERY AGGRESSIVE 1-minute long/flat crypto scalper that is still fee-honest.
 // The aggression is made survivable by three research-backed levers (see SKILL.md):
 //   1. MAKER-FIRST execution — post-only limit orders pay Alpaca's 0.15% maker fee,
 //      not the 0.25% taker fee. Maker-on-both-legs ~= 0.30% round-trip vs 0.50% all-taker.
-//      That nearly halves the fee floor that kills naive 5-min scalpers.
+//      That nearly halves the fee floor that kills naive 1-min scalpers.
 //   2. ATR VOLATILITY GATE — only fire when the expected move (ATR%) is large enough to
 //      clear the (now lower) fee floor, and ideally when volatility is EXPANDING.
 //   3. ATR-ADAPTIVE EXITS — take-profit / stop / trail scale with ATR-at-entry, so targets

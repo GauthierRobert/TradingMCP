@@ -1,25 +1,29 @@
-// CLI for binance-aggressive-scalper. Fetches public Binance 5m klines (no auth) + top-of-book
+// CLI for binance-aggressive-scalper. Fetches public Binance 1m klines (no auth) + top-of-book
 // and drives the self-learning AGGRESSIVE scalper. FAST: one small fetch, simple math.
 // Same engine as the Alpaca sibling — only the data source, symbols and fee model are Binance.
 //
 //   node run.mjs tick    "BTCUSDT,ETHUSDT" 1000      # ONE call/tick -> ready-to-execute plan per pair
 //   node run.mjs decide  "BTCUSDT" [long entryPx peakSince heldBars atrPctEntry]
 //   node run.mjs scan    "BTCUSDT,ETHUSDT,SOLUSDT"   # any BUY setups now? (best trading arm)
-//   node run.mjs learn   "BTCUSDT" 14                # score arms on real 5m klines + self-modify
+//   node run.mjs learn   "BTCUSDT" 14                # score arms on real 1m klines + self-modify
 //   node run.mjs size    "BTCUSDT" 1000              # ATR-risk notional (active arm's stop)
 //   node run.mjs opened  "ETHUSDT" 1860 0.5 A1 0.0012   # record a BUY fill (px qty arm atrPctEntry)
 //   node run.mjs closed  "ETHUSDT" 1875 take-profit     # record a SELL fill (px [exitReason])
 //   node run.mjs arms | status
 import { liveSignal, learnAndEvolve, selectActiveArm, selectTradingArm, loadState, saveState, logDecision,
   recordOutcome, readRealOutcomes, getArm, roundTripMaker, roundTripStop, feeFloor, loadPositions, savePositions } from './engine.mjs';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+const TICKS_FILE = join(dirname(fileURLToPath(import.meta.url)), '_state', 'loop_ticks.txt');
 
 const DATA = 'https://api.binance.com/api/v3';
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-// Public 5m klines, paginated forward by startTime (Binance caps each call at 1000 bars).
+// Public 1m klines, paginated forward by startTime (Binance caps each call at 1000 bars).
 // Maps Binance kline rows -> the engine's {o,h,l,c,v,t} shape. t = ISO of openTime (lexicographically
 // sortable == chronological), so run.mjs's `c.t > openedBarTime` bar-age math works unchanged.
-async function fetchBars(symbol, interval = '5m', { days = 14 } = {}) {
+async function fetchBars(symbol, interval = '1m', { days = 14 } = {}) {
   const endMs = Date.now();
   let startMs = endMs - days * 864e5;
   const all = [];
@@ -62,11 +66,11 @@ const state = NEEDS_STATE.includes(cmd) ? loadState() : null;
 if (cmd === 'decide') {
   const sym = args[0] || 'BTCUSDT';
   const position = { long: args[1] === 'long', entryPx: +(args[2] || 0), peakSince: +(args[3] || 0), heldBars: +(args[4] || 0), atrPctEntry: +(args[5] || 0) || undefined };
-  const [candles, obi] = await Promise.all([fetchBars(sym, '5m', { days: 3 }), fetchObi(sym)]);
+  const [candles, obi] = await Promise.all([fetchBars(sym, '1m', { days: 3 }), fetchObi(sym)]);
   const armId = selectActiveArm(state); const arm = getArm(state, armId);
   const sig = liveSignal(candles, position, arm.knobs, state.config, obi);
   let buyVotes = 0; for (const a of state.arms) { const s = liveSignal(candles, { long: false }, a.knobs, state.config, obi); if (s.action === 'BUY') buyVotes++; }
-  const out = { symbol: sym, timeframe: '5m', bars: candles.length, lastBarTime: candles[candles.length - 1]?.t,
+  const out = { symbol: sym, timeframe: '1m', bars: candles.length, lastBarTime: candles[candles.length - 1]?.t,
     activeArm: armId, obi: obi !== undefined ? +obi.toFixed(3) : 'n/a', position, signal: sig,
     buyConsensus: `${buyVotes}/${state.arms.length} arms`,
     feeFloorPct: +(feeFloor(state.config) * 100).toFixed(3), makerRoundTripPct: +(roundTripMaker(state.config) * 100).toFixed(3), stopRoundTripPct: +(roundTripStop(state.config) * 100).toFixed(3) };
@@ -75,12 +79,12 @@ if (cmd === 'decide') {
 }
 
 if (cmd === 'scan') {
-  const symbols = (args[0] || 'BTCUSDT,ETHUSDT,DOTUSDT,SOLUSDT,AVAXUSDT,XRPUSDT,LINKUSDT').split(',');
+  const symbols = (args[0] || 'BTCUSDT,ETHUSDT,SOLUSDT,AVAXUSDT,LINKUSDT,LTCUSDT,BCHUSDT,DOGEUSDT,DOTUSDT,XRPUSDT,AAVEUSDT,UNIUSDT').split(',');
   const armId = selectTradingArm(state); const arm = getArm(state, armId);
   const live = selectActiveArm(state);
-  console.log(`=== 5m AGGRESSIVE BUY scan — best trading arm ${armId} (live posture: ${live}${live === 'A0' ? ' = FLAT' : ''}) ===`);
+  console.log(`=== 1m AGGRESSIVE BUY scan — best trading arm ${armId} (live posture: ${live}${live === 'A0' ? ' = FLAT' : ''}) ===`);
   for (const sym of symbols) {
-    const [candles, obi] = await Promise.all([fetchBars(sym, '5m', { days: 3 }), fetchObi(sym)]);
+    const [candles, obi] = await Promise.all([fetchBars(sym, '1m', { days: 3 }), fetchObi(sym)]);
     const sig = liveSignal(candles, { long: false }, arm.knobs, state.config, obi);
     const tag = sig.action === 'BUY' ? `*** BUY  tgt ${sig.target} stop ${sig.stop} (tp ${sig.tpPct}%)` : `${sig.action} (${sig.reason})`;
     console.log(`${sym.padEnd(9)} @ ${String(sig.price).padStart(10)}  atr% ${String(sig.atrPct ?? '-').padStart(5)}  rsi ${String(sig.rsi ?? '-').padStart(5)}  obi ${obi !== undefined ? obi.toFixed(2) : ' n/a'}  -> ${tag}`);
@@ -90,12 +94,12 @@ if (cmd === 'scan') {
 if (cmd === 'learn') {
   const sym = args[0] || 'BTCUSDT';
   const days = +(args[1] || 14);
-  const candles = await fetchBars(sym, '5m', { days });
+  const candles = await fetchBars(sym, '1m', { days });
   const real = readRealOutcomes();
   const res = learnAndEvolve(state, candles, real);
   state.meta.lastLearn = new Date().toISOString();
   saveState(state);
-  console.log(`=== learn ${sym} ${days}d (${candles.length} 5m bars, ${real.length} real fills folded in) ===`);
+  console.log(`=== learn ${sym} ${days}d (${candles.length} 1m bars, ${real.length} real fills folded in) ===`);
   console.log(`leader ${res.leader} | active arm -> ${res.active}`);
   console.log(res.changes.length ? 'changes:\n  ' + res.changes.join('\n  ') : 'no structural change this pass');
   console.log('\narm                  ewMean    trades  win%   sumPnl%');
@@ -128,7 +132,7 @@ if (cmd === 'size') {
   const sym = args[0] || 'BTCUSDT';
   const equity = +(args[1] || 1000);
   const arm = getArm(state, selectTradingArm(state));
-  const [candles, obi] = await Promise.all([fetchBars(sym, '5m', { days: 2 }), fetchObi(sym)]);
+  const [candles, obi] = await Promise.all([fetchBars(sym, '1m', { days: 2 }), fetchObi(sym)]);
   const sig = liveSignal(candles, { long: false }, arm.knobs, state.config, obi);
   const price = candles[candles.length - 1].c;
   const stopPct = (sig.stopPct ? sig.stopPct / 100 : arm.knobs.stopAtrMult * 0.002);
@@ -142,15 +146,15 @@ if (cmd === 'size') {
     qty: +(notional / price).toFixed(6) }, null, 2));
 }
 
-// ---------- AUTOPILOT: one cheap call per 5-min tick -> a ready-to-execute plan ----------
+// ---------- AUTOPILOT: one cheap call per 1-min tick -> a ready-to-execute plan ----------
 if (cmd === 'tick') {
-  const symbols = (args[0] || 'BTCUSDT,ETHUSDT,DOTUSDT,SOLUSDT,AVAXUSDT,XRPUSDT,LINKUSDT').split(',');
+  const symbols = (args[0] || 'BTCUSDT,ETHUSDT,SOLUSDT,AVAXUSDT,LINKUSDT,LTCUSDT,BCHUSDT,DOGEUSDT,DOTUSDT,XRPUSDT,AAVEUSDT,UNIUSDT').split(',');
   const equity = +(args[1] || 1000);
   const positions = loadPositions();
   const activeId = selectActiveArm(state);
   const plan = [];
   for (const sym of symbols) {
-    const [candles, obi] = await Promise.all([fetchBars(sym, '5m', { days: 3 }), fetchObi(sym)]);
+    const [candles, obi] = await Promise.all([fetchBars(sym, '1m', { days: 3 }), fetchObi(sym)]);
     const last = candles[candles.length - 1];
     const held = positions[sym] && positions[sym].long ? positions[sym] : null;
     if (held) {
@@ -187,14 +191,17 @@ if (cmd === 'tick') {
   savePositions(positions);
   const lastLearn = state.meta.lastLearn ? Date.parse(state.meta.lastLearn) : 0;
   const learnDue = (Date.now() - lastLearn) > 55 * 60 * 1000;
-  console.log(JSON.stringify({ ts: new Date().toISOString(), equity, activeArm: activeId,
+  let ticks = 0; try { ticks = parseInt(readFileSync(TICKS_FILE, 'utf8').trim(), 10) || 0; } catch {}
+  ticks++; try { writeFileSync(TICKS_FILE, String(ticks)); } catch {}
+  const clearDue = ticks % 20 === 0;   // every 20 ticks (~20 min at 1m loop) -> reset Claude's context
+  console.log(JSON.stringify({ ts: new Date().toISOString(), equity, activeArm: activeId, ticks, clearDue,
     learnDue, learnHint: learnDue ? `node run.mjs learn "${symbols[0]}" 14` : null, plan }, null, 2));
 }
 
 if (cmd === 'opened') {
   const [sym, fillPx, fillQty, armId, atrPctEntry] = args;
   const positions = loadPositions();
-  const candles = await fetchBars(sym, '5m', { days: 1 });
+  const candles = await fetchBars(sym, '1m', { days: 1 });
   positions[sym] = { long: true, entryPx: +fillPx, qty: +fillQty, peak: +fillPx,
     openedAt: new Date().toISOString(), openedBarTime: candles[candles.length - 1]?.t, heldBars: 0,
     atrPctEntry: +atrPctEntry || undefined, armId: armId || selectActiveArm(state) };

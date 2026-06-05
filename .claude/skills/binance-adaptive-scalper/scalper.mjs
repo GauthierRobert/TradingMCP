@@ -1,6 +1,6 @@
 // binance-adaptive-scalper — core engine (pure, no network).
 //
-// One job: a FAST 5-minute long/flat momentum decision that improves itself.
+// One job: a FAST 1-minute long/flat momentum decision that improves itself.
 // The strategy is a small parameter vector (an "arm"); a counterfactual bandit
 // scores every arm on real recent price action (fictive feedback) and on actual
 // fills (real feedback), then SELF-MODIFIES the arm grid toward what works.

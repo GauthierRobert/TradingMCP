@@ -1,12 +1,14 @@
-// alpaca-adaptive-scalper — core engine (pure, no network).
+// alpaca-equity-scalper — core engine (pure, no network).
 //
 // One job: a FAST 1-minute long/flat momentum decision that improves itself.
 // The strategy is a small parameter vector (an "arm"); a counterfactual bandit
 // scores every arm on real recent price action (fictive feedback) and on actual
-// paper fills (real feedback), then SELF-MODIFIES the arm grid toward what works.
+// fills (real feedback), then SELF-MODIFIES the arm grid toward what works.
 //
-// Independent skill: no imports from the sibling Alpaca skills. Causal throughout
-// (a decision at bar i uses only bars <= i). Medium-aggressive defaults.
+// Venue-agnostic core (operates on {o,h,l,c,v,t} candle arrays) — identical to the
+// crypto alpaca-adaptive-scalper engine. Causal throughout (a decision at bar i uses
+// only bars <= i). Medium-aggressive defaults. The venue (US equities/ETFs) lives only
+// in run.mjs: auth'd IEX 1Min bar fetch, market-hours gating, commission-free fee model.
 import { readFileSync, writeFileSync, existsSync, appendFileSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';

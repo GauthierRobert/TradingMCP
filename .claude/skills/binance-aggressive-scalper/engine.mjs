@@ -2,7 +2,7 @@
 // PORTED VERBATIM from alpaca-aggressive-scalper: the engine is exchange-agnostic (it only
 // sees {o,h,l,c,v,t} candle arrays). Only run.mjs (data source) and the fee config differ.
 //
-// A VERY AGGRESSIVE 5-minute long/flat crypto scalper that is still fee-honest.
+// A VERY AGGRESSIVE 1-minute long/flat crypto scalper that is still fee-honest.
 // The aggression is made survivable by three research-backed levers (see SKILL.md):
 //   1. MAKER-FIRST execution — LIMIT_MAKER (post-only) entries. NOTE: on Binance maker == taker
 //      == 0.10%/fill, so this is NOT a fee discount (it is on Alpaca); it buys guaranteed

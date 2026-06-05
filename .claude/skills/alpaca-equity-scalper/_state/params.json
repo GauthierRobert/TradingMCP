@@ -1,26 +1,26 @@
 {
   "meta": {
-    "version": 37,
-    "updated": "2026-06-05T10:26:59.353Z",
-    "note": "Seed grid — UNVALIDATED. Active arm starts FLAT (A0). Run node run.mjs learn <SYM> <days> to score the trading arms on real recent 1Min bars; the bandit only leaves FLAT if a trading arm shows a positive net-of-fee EW mean.",
-    "lastLearn": "2026-06-05T10:26:59.353Z"
+    "version": 5,
+    "updated": "2026-06-04T20:48:55.859Z",
+    "note": "Seed grid for US EQUITIES/ETFs (commission-free) — UNVALIDATED. Active arm starts FLAT (A0). Run `node run.mjs learn <SYM> <days>` to score arms on real recent 1Min bars; the bandit only leaves FLAT if a trading arm shows a positive net-of-cost EW mean. Alpaca stock/ETF trades are COMMISSION-FREE, so the cost floor is just spread (~0.08%) vs crypto's ~0.58% — about 7x lower. This is the structural reason a 1-min scalp can clear costs here where it cannot on crypto. Still: let the learner prove it on real bars; do not assume.",
+    "lastLearn": "2026-06-04T20:48:55.859Z"
   },
   "config": {
     "timeframe": "1Min",
-    "makerFee": 0.0015,
-    "takerFee": 0.0025,
-    "spreadEst": 0.0008,
-    "buffer": 0.001,
+    "makerFee": 0,
+    "takerFee": 0,
+    "spreadEst": 0.0003,
+    "buffer": 0.0005,
     "riskPct": 0.015,
     "maxWeight": 0.25,
     "alpha": 0.25,
     "gamma": 0.97,
     "realWeight": 3,
     "minSamplesLeader": 6,
-    "evolveMargin": 0.0008,
+    "evolveMargin": 0.0005,
     "maxArms": 9
   },
-  "activeArm": "A0",
+  "activeArm": "A7",
   "arms": [
     {
       "id": "A0",
@@ -59,12 +59,12 @@
         "cooldown": 6
       },
       "stats": {
-        "ewMean": -0.005184725145043571,
-        "n": 33.332807293920965,
-        "trades": 363,
-        "wins": 5,
-        "losses": 358,
-        "sumPnl": -1.768187315245856
+        "ewMean": -0.0004468969004272348,
+        "n": 15.206855235775086,
+        "trades": 20,
+        "wins": 7,
+        "losses": 13,
+        "sumPnl": -0.008314663841833318
       }
     },
     {
@@ -89,17 +89,17 @@
         "cooldown": 6
       },
       "stats": {
-        "ewMean": -0.006434157445759082,
-        "n": 33.331896021327815,
-        "trades": 330,
-        "wins": 4,
-        "losses": 326,
-        "sumPnl": -1.637487440412803
+        "ewMean": -0.0003408531363072574,
+        "n": 13.472465204706491,
+        "trades": 17,
+        "wins": 7,
+        "losses": 10,
+        "sumPnl": -0.005708056615436835
       }
     },
     {
       "id": "A3",
-      "note": "quick — tight tp/stop, fast turnover",
+      "note": "quick — tight tp/stop, fast turnover (shines when costs are low)",
       "knobs": {
         "entryMode": "both",
         "breakoutN": 10,
@@ -110,21 +110,21 @@
         "volMult": 1,
         "pbBand": 0.004,
         "slopeBars": 12,
-        "tpPct": 0.008,
-        "stopPct": 0.005,
-        "trailArmPct": 0.005,
-        "trailPct": 0.004,
+        "tpPct": 0.006,
+        "stopPct": 0.004,
+        "trailArmPct": 0.004,
+        "trailPct": 0.003,
         "maxHold": 8,
         "minHold": 2,
-        "cooldown": 4
+        "cooldown": 3
       },
       "stats": {
-        "ewMean": -0.004974103716291789,
-        "n": 33.33328733341871,
-        "trades": 443,
-        "wins": 4,
-        "losses": 439,
-        "sumPnl": -2.131987216776363
+        "ewMean": -0.0009130684221301248,
+        "n": 17.286092602942535,
+        "trades": 24,
+        "wins": 6,
+        "losses": 18,
+        "sumPnl": -0.0091823776605683
       }
     },
     {
@@ -149,12 +149,12 @@
         "cooldown": 8
       },
       "stats": {
-        "ewMean": -0.007184116754477275,
-        "n": 26.064487488419736,
-        "trades": 50,
+        "ewMean": -0.0012159273407711191,
+        "n": 7.208554685410128,
+        "trades": 8,
         "wins": 2,
-        "losses": 48,
-        "sumPnl": -0.25912997800681214
+        "losses": 6,
+        "sumPnl": -0.00432469677016587
       }
     },
     {
@@ -170,28 +170,28 @@
         "volMult": 1,
         "pbBand": 0.004,
         "slopeBars": 12,
-        "tpPct": 0.012,
-        "stopPct": 0.006,
-        "trailArmPct": 0.005,
-        "trailPct": 0.005,
+        "tpPct": 0.01,
+        "stopPct": 0.005,
+        "trailArmPct": 0.004,
+        "trailPct": 0.004,
         "maxHold": 10,
         "minHold": 2,
-        "cooldown": 6
+        "cooldown": 5
       },
       "stats": {
-        "ewMean": -0.005468264192745766,
-        "n": 33.333109137858024,
-        "trades": 391,
-        "wins": 3,
-        "losses": 388,
-        "sumPnl": -1.8942927054205094
+        "ewMean": -0.0006738958342936654,
+        "n": 15.750649578701832,
+        "trades": 21,
+        "wins": 7,
+        "losses": 14,
+        "sumPnl": -0.009934919018299153
       }
     },
     {
       "id": "A7",
       "knobs": {
-        "entryMode": "both",
-        "breakoutN": 10,
+        "entryMode": "breakout",
+        "breakoutN": 12,
         "emaFast": 9,
         "emaMid": 21,
         "emaSlow": 50,
@@ -199,32 +199,40 @@
         "volMult": 1,
         "pbBand": 0.004,
         "slopeBars": 12,
-        "tpPct": 0.008,
-        "stopPct": 0.005,
-        "trailArmPct": 0.005,
-        "trailPct": 0.004,
-        "maxHold": 4,
-        "minHold": 2,
-        "cooldown": 4
+        "tpPct": 0.02,
+        "stopPct": 0.008,
+        "trailArmPct": 0.008,
+        "trailPct": 0.008,
+        "maxHold": 18,
+        "minHold": 3,
+        "cooldown": 6
       },
       "stats": {
-        "ewMean": -0.00481520918918037,
-        "n": 33.33332864911534,
-        "trades": 518,
-        "wins": 3,
-        "losses": 515,
-        "sumPnl": -2.5019578204502406
+        "ewMean": 0.0007316359087334852,
+        "n": 8.75252910350239,
+        "trades": 10,
+        "wins": 6,
+        "losses": 4,
+        "sumPnl": 0.002254753143875913
       },
-      "born": "2026-06-04T20:18:26.600Z",
-      "parent": "A3"
+      "born": "2026-06-04T20:48:55.859Z",
+      "parent": "A2"
     }
   ],
   "changelog": [
     {
-      "ts": "2026-06-04T20:18:26.601Z",
-      "window": 4032,
+      "ts": "2026-06-04T20:48:55.859Z",
+      "window": 781,
       "changes": [
-        "+A7 (ewMean -0.0030 > leader A3 -0.0045)"
+        "+A7 (ewMean 0.0007 > leader A2 -0.0003)",
+        "active A4 -> A7"
+      ]
+    },
+    {
+      "ts": "2026-06-04T18:57:22.955Z",
+      "window": 779,
+      "changes": [
+        "active A0 -> A4"
       ]
     }
   ]

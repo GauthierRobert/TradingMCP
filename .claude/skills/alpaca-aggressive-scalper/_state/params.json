@@ -1,12 +1,12 @@
 {
   "meta": {
-    "version": 4,
-    "updated": "2026-06-03T21:13:36.241Z",
-    "note": "VERY AGGRESSIVE seed grid — UNVALIDATED, PAPER ONLY. Active arm starts on A1 (aggressive momentum) because the user asked for aggression; the bandit DEMOTES to A0 (FLAT) the moment no trading arm clears the maker fee floor on recent real 5Min bars (this WILL happen in chop — it is correct, not a bug). Run `node run.mjs learn <SYM> <days>` to score. Fees modelled MAKER-FIRST: post-only limit entries+TP pay 0.15%; stops cross and pay 0.25%.",
-    "lastLearn": "2026-06-03T21:13:36.241Z"
+    "version": 13,
+    "updated": "2026-06-04T05:48:10.822Z",
+    "note": "VERY AGGRESSIVE seed grid — UNVALIDATED, PAPER ONLY. Active arm starts on A1 (aggressive momentum) because the user asked for aggression; the bandit DEMOTES to A0 (FLAT) the moment no trading arm clears the maker fee floor on recent real 1Min bars (this WILL happen in chop — it is correct, not a bug). Run `node run.mjs learn <SYM> <days>` to score. Fees modelled MAKER-FIRST: post-only limit entries+TP pay 0.15%; stops cross and pay 0.25%.",
+    "lastLearn": "2026-06-04T05:48:10.822Z"
   },
   "config": {
-    "timeframe": "5Min",
+    "timeframe": "1Min",
     "makerFee": 0.0015,
     "takerFee": 0.0025,
     "spreadEst": 0.0006,
@@ -68,12 +68,12 @@
         "cooldown": 1
       },
       "stats": {
-        "ewMean": -0.005108345423932694,
-        "n": 32.05261297899841,
-        "trades": 107,
-        "wins": 8,
-        "losses": 99,
-        "sumPnl": -0.4903695294150872
+        "ewMean": -0.0047291540601686975,
+        "n": 32.01300307113239,
+        "trades": 106,
+        "wins": 9,
+        "losses": 97,
+        "sumPnl": -0.480868408394145
       }
     },
     {
@@ -104,12 +104,12 @@
         "cooldown": 1
       },
       "stats": {
-        "ewMean": -0.0048644841330841735,
-        "n": 31.930070221205646,
-        "trades": 104,
-        "wins": 10,
-        "losses": 94,
-        "sumPnl": -0.48316058448926025
+        "ewMean": -0.0036549590900381702,
+        "n": 31.886670331139843,
+        "trades": 103,
+        "wins": 11,
+        "losses": 92,
+        "sumPnl": -0.46966695196820246
       }
     },
     {
@@ -140,12 +140,12 @@
         "cooldown": 0
       },
       "stats": {
-        "ewMean": -0.005180892365221538,
-        "n": 32.9769912202933,
-        "trades": 149,
-        "wins": 6,
-        "losses": 143,
-        "sumPnl": -0.7091242295745213
+        "ewMean": -0.004754037661030771,
+        "n": 32.93082005296451,
+        "trades": 145,
+        "wins": 7,
+        "losses": 138,
+        "sumPnl": -0.682971490204635
       }
     },
     {
