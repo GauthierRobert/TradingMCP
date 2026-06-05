@@ -1,0 +1,320 @@
+{
+  "meta": {
+    "version": 49,
+    "updated": "2026-06-05T20:51:50.840Z",
+    "note": "Seed grid — UNVALIDATED. Active arm starts FLAT (A0). Run node run.mjs learn <SYM> <days> to score the trading arms on real recent 1Min bars; the bandit only leaves FLAT if a trading arm shows a positive net-of-fee EW mean.",
+    "lastLearn": "2026-06-05T20:51:50.840Z"
+  },
+  "config": {
+    "timeframe": "1Min",
+    "makerFee": 0.0015,
+    "takerFee": 0.0025,
+    "spreadEst": 0.0008,
+    "buffer": 0.001,
+    "riskPct": 0.015,
+    "maxWeight": 0.25,
+    "alpha": 0.25,
+    "gamma": 0.97,
+    "realWeight": 3,
+    "minSamplesLeader": 6,
+    "evolveMargin": 0.0008,
+    "maxArms": 12
+  },
+  "activeArm": "A0",
+  "arms": [
+    {
+      "id": "A0",
+      "note": "FLAT — do nothing / cash (capital preservation)",
+      "knobs": {
+        "flat": true
+      },
+      "stats": {
+        "ewMean": 0,
+        "n": 0,
+        "trades": 6,
+        "wins": 0,
+        "losses": 0,
+        "sumPnl": 0
+      }
+    },
+    {
+      "id": "A1",
+      "note": "balanced / medium-aggressive default",
+      "knobs": {
+        "entryMode": "both",
+        "breakoutN": 12,
+        "emaFast": 9,
+        "emaMid": 21,
+        "emaSlow": 50,
+        "rsiMaxBuy": 74,
+        "volMult": 1,
+        "pbBand": 0.004,
+        "slopeBars": 12,
+        "tpPct": 0.012,
+        "stopPct": 0.007,
+        "trailArmPct": 0.006,
+        "trailPct": 0.006,
+        "maxHold": 12,
+        "minHold": 3,
+        "cooldown": 6
+      },
+      "stats": {
+        "ewMean": -0.004976268126382256,
+        "n": 33.08608808029952,
+        "trades": 161,
+        "wins": 4,
+        "losses": 157,
+        "sumPnl": -0.8150454048385053
+      }
+    },
+    {
+      "id": "A2",
+      "note": "runner — wider tp, lets winners breathe",
+      "knobs": {
+        "entryMode": "both",
+        "breakoutN": 12,
+        "emaFast": 9,
+        "emaMid": 21,
+        "emaSlow": 50,
+        "rsiMaxBuy": 74,
+        "volMult": 1,
+        "pbBand": 0.004,
+        "slopeBars": 12,
+        "tpPct": 0.02,
+        "stopPct": 0.008,
+        "trailArmPct": 0.008,
+        "trailPct": 0.008,
+        "maxHold": 18,
+        "minHold": 3,
+        "cooldown": 6
+      },
+      "stats": {
+        "ewMean": -0.003094635526086535,
+        "n": 33.02733023607601,
+        "trades": 154,
+        "wins": 5,
+        "losses": 149,
+        "sumPnl": -0.7772517509202481
+      }
+    },
+    {
+      "id": "A3",
+      "note": "quick — tight tp/stop, fast turnover",
+      "knobs": {
+        "entryMode": "both",
+        "breakoutN": 10,
+        "emaFast": 9,
+        "emaMid": 21,
+        "emaSlow": 50,
+        "rsiMaxBuy": 74,
+        "volMult": 1,
+        "pbBand": 0.004,
+        "slopeBars": 12,
+        "tpPct": 0.008,
+        "stopPct": 0.005,
+        "trailArmPct": 0.005,
+        "trailPct": 0.004,
+        "maxHold": 8,
+        "minHold": 2,
+        "cooldown": 4
+      },
+      "stats": {
+        "ewMean": -0.005193144291881153,
+        "n": 33.161784103223425,
+        "trades": 173,
+        "wins": 2,
+        "losses": 171,
+        "sumPnl": -0.8728188815666563
+      }
+    },
+    {
+      "id": "A4",
+      "note": "breakout-strict — volume-confirmed breakouts only (most selective)",
+      "knobs": {
+        "entryMode": "breakout",
+        "breakoutN": 16,
+        "emaFast": 9,
+        "emaMid": 21,
+        "emaSlow": 50,
+        "rsiMaxBuy": 72,
+        "volMult": 1.2,
+        "pbBand": 0.004,
+        "slopeBars": 16,
+        "tpPct": 0.015,
+        "stopPct": 0.008,
+        "trailArmPct": 0.007,
+        "trailPct": 0.007,
+        "maxHold": 14,
+        "minHold": 3,
+        "cooldown": 8
+      },
+      "stats": {
+        "ewMean": -0.007184114043094837,
+        "n": 25.60791528155993,
+        "trades": 48,
+        "wins": 2,
+        "losses": 46,
+        "sumPnl": -0.24684839355553703
+      }
+    },
+    {
+      "id": "A5",
+      "note": "tight-momo — balanced entry, fast trail",
+      "knobs": {
+        "entryMode": "both",
+        "breakoutN": 12,
+        "emaFast": 9,
+        "emaMid": 21,
+        "emaSlow": 50,
+        "rsiMaxBuy": 74,
+        "volMult": 1,
+        "pbBand": 0.004,
+        "slopeBars": 12,
+        "tpPct": 0.012,
+        "stopPct": 0.006,
+        "trailArmPct": 0.005,
+        "trailPct": 0.005,
+        "maxHold": 10,
+        "minHold": 2,
+        "cooldown": 6
+      },
+      "stats": {
+        "ewMean": -0.005096820584408645,
+        "n": 33.107679266511205,
+        "trades": 164,
+        "wins": 2,
+        "losses": 162,
+        "sumPnl": -0.8329880465013433
+      }
+    },
+    {
+      "id": "A7",
+      "knobs": {
+        "entryMode": "both",
+        "breakoutN": 10,
+        "emaFast": 9,
+        "emaMid": 21,
+        "emaSlow": 50,
+        "rsiMaxBuy": 74,
+        "volMult": 1,
+        "pbBand": 0.004,
+        "slopeBars": 12,
+        "tpPct": 0.008,
+        "stopPct": 0.005,
+        "trailArmPct": 0.005,
+        "trailPct": 0.004,
+        "maxHold": 4,
+        "minHold": 2,
+        "cooldown": 4
+      },
+      "stats": {
+        "ewMean": -0.004193412373934783,
+        "n": 33.21430521048692,
+        "trades": 185,
+        "wins": 1,
+        "losses": 184,
+        "sumPnl": -0.906255610304624
+      },
+      "born": "2026-06-04T20:18:26.600Z",
+      "parent": "A3"
+    },
+    {
+      "id": "A6",
+      "knobs": {
+        "entryMode": [
+          "breakout",
+          "momentum"
+        ],
+        "breakoutN": 12,
+        "emaFast": 9,
+        "emaMid": 21,
+        "emaSlow": 50,
+        "rsiMaxBuy": 78,
+        "volMult": 1.1,
+        "pbBand": 0.004,
+        "slopeBars": 12,
+        "momWindow": 20,
+        "momThresh": 0.02,
+        "momRsiMax": 82,
+        "atrLen": 14,
+        "atrGateMult": 1,
+        "atrTpMult": 2.5,
+        "atrStopMult": 1.5,
+        "rsiOBExit": 80,
+        "tpPct": 0.014,
+        "stopPct": 0.008,
+        "trailArmPct": 0.006,
+        "trailPct": 0.006,
+        "maxHold": 24,
+        "minHold": 3,
+        "cooldown": 4
+      },
+      "stats": {
+        "ewMean": 0,
+        "n": 0,
+        "trades": 0,
+        "wins": 0,
+        "losses": 0,
+        "sumPnl": 0
+      },
+      "born": "2026-06-05T11:22:04.967Z",
+      "note": "momentum-burst rider: ROC>=2%/20bars, ATR-scaled targets, rides up to 24min"
+    },
+    {
+      "id": "A8",
+      "knobs": {
+        "entryMode": [
+          "oversold",
+          "pullback"
+        ],
+        "breakoutN": 12,
+        "emaFast": 9,
+        "emaMid": 21,
+        "emaSlow": 50,
+        "rsiMaxBuy": 74,
+        "volMult": 1,
+        "pbBand": 0.005,
+        "slopeBars": 20,
+        "rsiOSBuy": 42,
+        "rsiOBExit": 75,
+        "macdConfirm": true,
+        "macdFast": 12,
+        "macdSlow": 26,
+        "macdSignal": 9,
+        "atrLen": 14,
+        "atrGateMult": 1,
+        "bbConfirm": true,
+        "bbLen": 20,
+        "bbK": 2,
+        "bbMaxPctB": 1.05,
+        "tpPct": 0.012,
+        "stopPct": 0.007,
+        "trailArmPct": 0.005,
+        "trailPct": 0.006,
+        "maxHold": 18,
+        "minHold": 4,
+        "cooldown": 6,
+        "osBandBelow": 0.01
+      },
+      "stats": {
+        "ewMean": 0,
+        "n": 0,
+        "trades": 0,
+        "wins": 0,
+        "losses": 0,
+        "sumPnl": 0
+      },
+      "born": "2026-06-05T11:22:04.967Z",
+      "note": "oversold-reversal bounce + MACD/Bollinger confirm, RSI75 overbought exit"
+    }
+  ],
+  "changelog": [
+    {
+      "ts": "2026-06-04T20:18:26.601Z",
+      "window": 4032,
+      "changes": [
+        "+A7 (ewMean -0.0030 > leader A3 -0.0045)"
+      ]
+    }
+  ]
+}
