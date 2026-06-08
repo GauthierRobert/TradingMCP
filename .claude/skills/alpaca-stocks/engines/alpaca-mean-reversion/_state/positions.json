@@ -1,0 +1,30 @@
+{
+  "SLV": {
+    "entryPx": 61.59,
+    "qty": 243.545868,
+    "peak": 61.59,
+    "peakSince": 61.59,
+    "trough": 61.59,
+    "troughSince": 61.59,
+    "heldBars": 0,
+    "openedAt": "2026-06-08T20:00:06.382Z",
+    "openedBarTime": "2026-06-08T19:45:00Z",
+    "long": true,
+    "target": 64.05,
+    "stop": 60.05
+  },
+  "QQQ": {
+    "entryPx": 716.08,
+    "qty": 20.947254,
+    "peak": 716.26,
+    "peakSince": 716.08,
+    "trough": 716.08,
+    "troughSince": 716.08,
+    "heldBars": 1,
+    "openedAt": "2026-06-08T20:00:34.486Z",
+    "openedBarTime": "2026-06-08T19:45:00Z",
+    "long": true,
+    "target": 721.78,
+    "stop": 698.15
+  }
+}

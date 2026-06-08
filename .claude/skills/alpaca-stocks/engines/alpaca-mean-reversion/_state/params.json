@@ -1,0 +1,18 @@
+{
+  "tf": 15,
+  "rsiP": 14,
+  "entryRsi": 30,
+  "lookback": 3,
+  "emaSpan": 20,
+  "tpCapPct": 0.04,
+  "minTpPct": 0.008,
+  "stopPct": 0.025,
+  "swingLowN": 6,
+  "exitRsi": 55,
+  "maxHoldBars": 26,
+  "trailPct": 0.02,
+  "riskPct": 0.01,
+  "maxWeight": 0.15,
+  "spreadEst": 0.0008,
+  "feed": "iex"
+}

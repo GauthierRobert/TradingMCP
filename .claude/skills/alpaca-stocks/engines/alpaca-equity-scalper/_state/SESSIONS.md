@@ -22,3 +22,16 @@ the ~0.08% spread-only cost floor on real bars. (Commission-free → ~7x lower f
 2026-06-05T19:48Z | learn(SPY,14d 1Min): network recovered; active A0 FLAT held | no structural change
 2026-06-05T20:18Z | ERROR: equity tick failed 3x (data.alpaca.markets connect timeout) — tick + hourly skipped (will retry next tick); book FLAT, no risk
 2026-06-05T20:44Z | learn(SPY,14d 1Min): active A0 FLAT held | no structural change
+2026-06-06T12:12Z | ERROR: equity tick failed 2x (data.alpaca.markets connect timeout) - tick skipped; market closed, book FLAT, no positions at risk
+2026-06-06T20:36Z | ERROR: equity tick 2x failed (data.alpaca.markets connect timeout) - skipped; market closed (weekend), book FLAT, no positions at risk
+2026-06-06T21:02Z | ERROR: equity tick 2x failed (ECONNRESET + connect timeout) - skipped; market closed (weekend), book FLAT, no positions at risk
+2026-06-07T00:37Z | ERROR: equity tick 2x failed (data.alpaca.markets connect timeout) - skipped; market closed (weekend), book FLAT, no positions at risk
+- 2026-06-08T12:01Z [equity] market OPEN; learn SPY 14d (3614 bars, 4 fills) → leader A1, active A0 FLAT, no structural change
+- 2026-06-08T12:57Z [equity] learn SPY 14d (3622 bars, 4 fills) → leader A1, active A0 FLAT, no structural change
+- 2026-06-08T13:53Z [equity] learn SPY 14d (3646 bars, 4 fills) → leader now A5 (was A1), active A0 FLAT, no structural change
+- 2026-06-08T14:49Z [equity] learn SPY 14d (3702 bars, 4 fills) → leader A5, active A0 FLAT, no structural change
+- 2026-06-08T15:45Z [equity] learn SPY 14d (3758 bars, 4 fills) → leader now A3 (was A5), active A0 FLAT, no structural change
+- 2026-06-08T16:41Z [equity] learn SPY 14d (3814 bars, 4 fills) → leader A3, active A0 FLAT, no structural change
+- 2026-06-08T17:37Z [equity] learn SPY 14d (3871 bars, 4 fills) → leader A3, active A0 FLAT, no structural change
+- 2026-06-08T18:33Z [equity] learn SPY 14d (3927 bars, 4 fills) → leader A3, active A0 FLAT, no structural change
+- 2026-06-08T19:58Z [equity] learn SPY 14d (4013 bars) → leader A3, active A0 FLAT, no change

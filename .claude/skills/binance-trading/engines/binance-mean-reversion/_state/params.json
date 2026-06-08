@@ -1,0 +1,21 @@
+{
+  "tf": 15,
+  "rsiP": 14,
+  "entryRsi": 30,
+  "overboughtRsi": 70,
+  "enableShort": true,
+  "lookback": 3,
+  "emaSpan": 20,
+  "tpCapPct": 0.06,
+  "minTpPct": 0.012,
+  "stopPct": 0.03,
+  "swingN": 6,
+  "exitRsi": 55,
+  "exitRsiShort": 45,
+  "maxHoldBars": 26,
+  "trailPct": 0.025,
+  "riskPct": 0.01,
+  "maxWeight": 0.15,
+  "feeRt": 0.002,
+  "staleMin": 10
+}

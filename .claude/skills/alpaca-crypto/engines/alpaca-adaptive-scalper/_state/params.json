@@ -1,9 +1,9 @@
 {
   "meta": {
-    "version": 49,
-    "updated": "2026-06-05T20:51:50.840Z",
+    "version": 100,
+    "updated": "2026-06-08T20:00:42.192Z",
     "note": "Seed grid — UNVALIDATED. Active arm starts FLAT (A0). Run node run.mjs learn <SYM> <days> to score the trading arms on real recent 1Min bars; the bandit only leaves FLAT if a trading arm shows a positive net-of-fee EW mean.",
-    "lastLearn": "2026-06-05T20:51:50.840Z"
+    "lastLearn": "2026-06-08T20:00:42.192Z"
   },
   "config": {
     "timeframe": "1Min",
@@ -59,12 +59,12 @@
         "cooldown": 6
       },
       "stats": {
-        "ewMean": -0.004976268126382256,
-        "n": 33.08608808029952,
-        "trades": 161,
-        "wins": 4,
-        "losses": 157,
-        "sumPnl": -0.8150454048385053
+        "ewMean": -0.006280796140373282,
+        "n": 33.176764982841235,
+        "trades": 176,
+        "wins": 3,
+        "losses": 173,
+        "sumPnl": -0.9232041411416632
       }
     },
     {
@@ -89,12 +89,12 @@
         "cooldown": 6
       },
       "stats": {
-        "ewMean": -0.003094635526086535,
-        "n": 33.02733023607601,
-        "trades": 154,
+        "ewMean": -0.006150224059558458,
+        "n": 33.13955650811558,
+        "trades": 169,
         "wins": 5,
-        "losses": 149,
-        "sumPnl": -0.7772517509202481
+        "losses": 164,
+        "sumPnl": -0.8863562919100464
       }
     },
     {
@@ -119,12 +119,12 @@
         "cooldown": 4
       },
       "stats": {
-        "ewMean": -0.005193144291881153,
-        "n": 33.161784103223425,
-        "trades": 173,
+        "ewMean": -0.006065791910365364,
+        "n": 33.22133977254714,
+        "trades": 187,
         "wins": 2,
-        "losses": 171,
-        "sumPnl": -0.8728188815666563
+        "losses": 185,
+        "sumPnl": -0.9645225590645067
       }
     },
     {
@@ -149,12 +149,12 @@
         "cooldown": 8
       },
       "stats": {
-        "ewMean": -0.007184114043094837,
-        "n": 25.60791528155993,
-        "trades": 48,
-        "wins": 2,
-        "losses": 46,
-        "sumPnl": -0.24684839355553703
+        "ewMean": -0.006210872510892584,
+        "n": 26.89827636983295,
+        "trades": 54,
+        "wins": 1,
+        "losses": 53,
+        "sumPnl": -0.3092025934861968
       }
     },
     {
@@ -179,12 +179,12 @@
         "cooldown": 6
       },
       "stats": {
-        "ewMean": -0.005096820584408645,
-        "n": 33.107679266511205,
-        "trades": 164,
+        "ewMean": -0.006315852508028371,
+        "n": 33.19043762718466,
+        "trades": 179,
         "wins": 2,
-        "losses": 162,
-        "sumPnl": -0.8329880465013433
+        "losses": 177,
+        "sumPnl": -0.9355010703166622
       }
     },
     {
@@ -208,12 +208,12 @@
         "cooldown": 4
       },
       "stats": {
-        "ewMean": -0.004193412373934783,
-        "n": 33.21430521048692,
-        "trades": 185,
+        "ewMean": -0.0052328725940583055,
+        "n": 33.26021987401011,
+        "trades": 201,
         "wins": 1,
-        "losses": 184,
-        "sumPnl": -0.906255610304624
+        "losses": 200,
+        "sumPnl": -0.9935562038653529
       },
       "born": "2026-06-04T20:18:26.600Z",
       "parent": "A3"
@@ -250,12 +250,12 @@
         "cooldown": 4
       },
       "stats": {
-        "ewMean": 0,
-        "n": 0,
-        "trades": 0,
+        "ewMean": -0.0036651862328709807,
+        "n": 1,
+        "trades": 1,
         "wins": 0,
-        "losses": 0,
-        "sumPnl": 0
+        "losses": 1,
+        "sumPnl": -0.014660744931483923
       },
       "born": "2026-06-05T11:22:04.967Z",
       "note": "momentum-burst rider: ROC>=2%/20bars, ATR-scaled targets, rides up to 24min"

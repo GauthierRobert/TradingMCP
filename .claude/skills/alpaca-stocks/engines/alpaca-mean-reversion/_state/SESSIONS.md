@@ -1,0 +1,3 @@
+- 2026-06-08T19:58Z [meanrev] BUY long QQQ 20.95@716.08 (tgt 721.78 stop 698.15) + SLV 243.55@61.59 (tgt 64.05 stop 60.05) — oversold-bounce, paper filled
+- 2026-06-08T20:03Z [meanrev] TLT BUY signalled (oversold rsi 22→24) — limit 84.64 missed the bounce, order cancelled (no fill). Holding QQQ, SLV.
+- 2026-06-08T20:05Z [meanrev] TLT re-signalled but US market CLOSED (16:05 ET) — no fill, order cancelled. Holding QQQ, SLV overnight (stops 698.15 / 60.05).

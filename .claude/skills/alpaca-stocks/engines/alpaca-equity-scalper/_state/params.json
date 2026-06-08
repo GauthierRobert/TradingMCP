@@ -1,9 +1,9 @@
 {
   "meta": {
-    "version": 14,
-    "updated": "2026-06-05T20:44:19.712Z",
+    "version": 23,
+    "updated": "2026-06-08T20:01:56.867Z",
     "note": "Seed grid for US EQUITIES/ETFs (commission-free) — UNVALIDATED. Active arm starts FLAT (A0). Run `node run.mjs learn <SYM> <days>` to score arms on real recent 1Min bars; the bandit only leaves FLAT if a trading arm shows a positive net-of-cost EW mean. Alpaca stock/ETF trades are COMMISSION-FREE, so the cost floor is just spread (~0.08%) vs crypto's ~0.58% — about 7x lower. This is the structural reason a 1-min scalp can clear costs here where it cannot on crypto. Still: let the learner prove it on real bars; do not assume.",
-    "lastLearn": "2026-06-05T20:44:19.712Z"
+    "lastLearn": "2026-06-08T20:01:56.867Z"
   },
   "config": {
     "timeframe": "1Min",
@@ -59,12 +59,12 @@
         "cooldown": 6
       },
       "stats": {
-        "ewMean": -0.0009552205713992056,
-        "n": 29.725758515639626,
-        "trades": 73,
-        "wins": 24,
-        "losses": 49,
-        "sumPnl": -0.010894507422969898
+        "ewMean": -0.00042902542010150077,
+        "n": 30.418474769372402,
+        "trades": 80,
+        "wins": 27,
+        "losses": 53,
+        "sumPnl": -0.013914417911080473
       }
     },
     {
@@ -89,12 +89,12 @@
         "cooldown": 6
       },
       "stats": {
-        "ewMean": -0.0009785454259411813,
-        "n": 28.58796707050492,
-        "trades": 64,
-        "wins": 25,
-        "losses": 39,
-        "sumPnl": -0.008749616525181914
+        "ewMean": -0.0007066017972818424,
+        "n": 29.499158800764828,
+        "trades": 71,
+        "wins": 27,
+        "losses": 44,
+        "sumPnl": -0.012486264571658365
       }
     },
     {
@@ -119,12 +119,12 @@
         "cooldown": 3
       },
       "stats": {
-        "ewMean": -0.00100297247680067,
-        "n": 30.905337751226323,
-        "trades": 86,
-        "wins": 26,
-        "losses": 60,
-        "sumPnl": -0.01904820759195664
+        "ewMean": -0.00020854155863553428,
+        "n": 31.54287081109332,
+        "trades": 96,
+        "wins": 29,
+        "losses": 67,
+        "sumPnl": -0.021932040080719216
       }
     },
     {
@@ -149,12 +149,12 @@
         "cooldown": 8
       },
       "stats": {
-        "ewMean": -0.03836370285229069,
-        "n": 19.126826494379213,
-        "trades": 28,
-        "wins": 9,
-        "losses": 19,
-        "sumPnl": -0.08450674585982357
+        "ewMean": -0.038361824889010826,
+        "n": 20.36743811710456,
+        "trades": 31,
+        "wins": 11,
+        "losses": 20,
+        "sumPnl": -0.08409130492611586
       }
     },
     {
@@ -179,12 +179,12 @@
         "cooldown": 5
       },
       "stats": {
-        "ewMean": -0.0009797811982835572,
-        "n": 30.418474769372402,
-        "trades": 80,
-        "wins": 23,
-        "losses": 57,
-        "sumPnl": -0.019486647021451725
+        "ewMean": -0.000807494491040276,
+        "n": 31.18384630178223,
+        "trades": 90,
+        "wins": 26,
+        "losses": 64,
+        "sumPnl": -0.02481889394011637
       }
     },
     {
@@ -208,12 +208,12 @@
         "cooldown": 6
       },
       "stats": {
-        "ewMean": -0.0010816986100050394,
-        "n": 22.53310559937192,
-        "trades": 37,
-        "wins": 16,
-        "losses": 21,
-        "sumPnl": -0.0029506150118014923
+        "ewMean": -0.000789384668218716,
+        "n": 23.7719693740947,
+        "trades": 41,
+        "wins": 17,
+        "losses": 24,
+        "sumPnl": -0.005205202120301197
       },
       "born": "2026-06-04T20:48:55.859Z",
       "parent": "A2"
